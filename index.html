@@ -19,6 +19,7 @@
             --input-bg: #2d2d2d; --shadow: rgba(0,0,0,0.5);
         }
 
+        /* SHARP UI Reset */
         * { box-sizing: border-box; margin: 0; padding: 0; border-radius: 0 !important; }
         
         body { 
@@ -40,7 +41,6 @@
         .nav-btn { flex: 1; padding: 12px 0 14px; border: none; background: transparent; cursor: pointer; color: var(--text-muted); position: relative; display: flex; justify-content: center; }
         .nav-btn.active { color: var(--accent); }
         .nav-btn.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--accent); }
-        .nav.bottom .nav-btn.active::after { bottom: auto; top: 0; }
 
         .material-symbols-outlined { font-size: 22px; font-variation-settings: 'FILL' var(--fill), 'wght' 400, 'opsz' 20; transition: font-variation-settings 0.2s; }
         .active .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
@@ -61,12 +61,12 @@
         .emoji-btn img { width: 30px; height: 30px; object-fit: contain; }
 
         .footer { height: 72px; padding: 0 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 14px; background: var(--bg); flex-shrink: 0; }
-        .footer.top { order: -1; border-top: none; border-bottom: 1px solid var(--border); }
         #preview-char { font-size: 36px; min-width: 44px; text-align: center; display: flex; align-items: center; justify-content: center; }
         #preview-char img { width: 38px; height: 38px; }
         #preview-name { font-size: 14px; color: var(--text-muted); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
         
-        .skin-trigger { width: 24px; height: 24px; border: 1px solid #666; cursor: pointer; background-size: cover; }
+        /* Skin Tones UI */
+        .skin-trigger { width: 24px; height: 24px; border: 1px solid #666; cursor: pointer; background-size: cover; background-position: center; }
         .skin-menu { position: absolute; bottom: 72px; right: 0; background: var(--bg); box-shadow: 0 -4px 20px rgba(0,0,0,0.3); border: 1px solid var(--border-outer); display: none; flex-direction: column; width: 175px; padding: 2px; z-index: 100; }
         .skin-menu.active { display: flex; }
         .skin-opt { display: flex; align-items: center; gap: 10px; padding: 10px 12px; cursor: pointer; font-size: 13px; color: var(--text-main); }
@@ -110,15 +110,15 @@
         </div>
         <div class="footer" id="picker-footer">
             <div id="preview-char">✨</div>
-            <div id="preview-name" id="text-placeholder">Select an emoji</div>
+            <div id="preview-name">Select an emoji</div>
             <div id="skin-trigger" class="skin-trigger"></div>
             <div id="skin-menu" class="skin-menu">
-                <div class="skin-opt" data-idx="0"><img src="/skintone/default.png"> Default</div>
-                <div class="skin-opt" data-idx="1"><img src="/skintone/light.png"> Light</div>
-                <div class="skin-opt" data-idx="2"><img src="/skintone/mediumlight.png"> Medium-Light</div>
-                <div class="skin-opt" data-idx="3"><img src="/skintone/medium.png"> Medium</div>
-                <div class="skin-opt" data-idx="4"><img src="/skintone/mediumdark.png"> Medium-Dark</div>
-                <div class="skin-opt" data-idx="5"><img src="/skintone/dark.png"> Dark</div>
+                <div class="skin-opt" data-idx="0"><img> <span>Default</span></div>
+                <div class="skin-opt" data-idx="1"><img> <span>Light</span></div>
+                <div class="skin-opt" data-idx="2"><img> <span>Medium-Light</span></div>
+                <div class="skin-opt" data-idx="3"><img> <span>Medium</span></div>
+                <div class="skin-opt" data-idx="4"><img> <span>Medium-Dark</span></div>
+                <div class="skin-opt" data-idx="5"><img> <span>Dark</span></div>
             </div>
         </div>
     </div>
@@ -139,13 +139,16 @@
 
 <script>
     const I18N = {
-        en: { search: "Search emojis...", recent: "Frequently used", placeholder: "Select an emoji", set: "Set:", theme: "Theme:", icons: "Icons:", version: "Emoji version:", locale: "Locale (UI):", nav: "Nav position:", prev: "Preview position:" },
-        pl: { search: "Szukaj emoji...", recent: "Często używane", placeholder: "Wybierz emoji", set: "Zestaw:", theme: "Motyw:", icons: "Ikony:", version: "Wersja emoji:", locale: "Język (UI):", nav: "Pozycja nawigacji:", prev: "Pozycja podglądu:" }
+        en: { search: "Search emojis...", recent: "Frequently used", placeholder: "Select an emoji", set: "Set:", theme: "Theme:", icons: "Icons:", version: "Emoji version:", locale: "Locale (UI):", nav: "Nav position:", prev: "Preview position:", tones: ["Default","Light","Medium-Light","Medium","Medium-Dark","Dark"] },
+        pl: { search: "Szukaj emoji...", recent: "Często używane", placeholder: "Wybierz emoji", set: "Zestaw:", theme: "Motyw:", icons: "Ikony:", version: "Wersja emoji:", locale: "Język (UI):", nav: "Pozycja nawigacji:", prev: "Pozycja podglądu:", tones: ["Domyślny","Jasny","Średnio-jasny","Średni","Średnio-ciemny","Ciemny"] }
     };
 
-    let ALL_DATA = [], GROUPS = {}, RECENT = JSON.parse(localStorage.getItem('kenig_fav_i18n') || '[]');
-    let SKIN = parseInt(localStorage.getItem('kenig_skin_v9') || '0'), SET = localStorage.getItem('kenig_set_v9') || 'native';
-    let THEME = localStorage.getItem('kenig_theme_v9') || 'auto', ICONS = localStorage.getItem('kenig_icons_v9') || 'auto', LOCALE = localStorage.getItem('kenig_lang_v9') || 'en';
+    const SKIN_NATIVE = ['default','light','mediumlight','medium','mediumdark','dark'].map(n => `/skintone/${n}.png`);
+    const SKIN_OPENMOJI = ['default','light','mediumlight','medium','mediumdark','dark'].map(n => `/skintone/openmoji_${n}.svg`);
+
+    let ALL_DATA = [], GROUPS = {}, RECENT = JSON.parse(localStorage.getItem('kenig_fav_i18n_v2') || '[]');
+    let SKIN = parseInt(localStorage.getItem('kenig_skin_v2') || '0'), SET = localStorage.getItem('kenig_set_v2') || 'native';
+    let THEME = localStorage.getItem('kenig_theme_v2') || 'auto', ICONS = localStorage.getItem('kenig_icons_v2') || 'auto', LOCALE = localStorage.getItem('kenig_lang_v2') || 'en';
 
     async function fetchData() {
         document.getElementById('loader').style.display = 'flex';
@@ -153,10 +156,9 @@
             fetch(`https://cdn.jsdelivr.net/npm/emojibase-data@latest/${LOCALE}/data.json`).then(r=>r.json()),
             fetch(`https://cdn.jsdelivr.net/npm/emojibase-data@latest/${LOCALE}/messages.json`).then(r=>r.json())
         ]);
-        ALL_DATA = d;
-        m.groups.forEach(g => GROUPS[g.order] = g.message);
+        ALL_DATA = d; m.groups.forEach(g => GROUPS[g.order] = g.message);
         document.getElementById('loader').style.display = 'none';
-        updateUIStrings(); render();
+        updateSkinUI(); updateUIStrings(); render();
     }
 
     function updateUIStrings() {
@@ -164,21 +166,20 @@
         document.getElementById('search').placeholder = t.search;
         document.getElementById('title-recent').textContent = t.recent;
         document.getElementById('preview-name').textContent = t.placeholder;
-        document.getElementById('lbl-set').textContent = t.set;
-        document.getElementById('lbl-theme').textContent = t.theme;
-        document.getElementById('lbl-icons').textContent = t.icons;
-        document.getElementById('lbl-version').textContent = t.version;
-        document.getElementById('lbl-locale').textContent = t.locale;
-        document.getElementById('lbl-nav').textContent = t.nav;
-        document.getElementById('lbl-prev').textContent = t.prev;
+        ['set','theme','icons','version','locale','nav','prev'].forEach(k => document.getElementById(`lbl-${k}`).textContent = t[k]);
+        document.querySelectorAll('.skin-opt span').forEach((s, i) => s.textContent = t.tones[i]);
     }
 
     function updateThemeAndIcons() {
         let activeTheme = THEME === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : THEME;
         document.documentElement.setAttribute('data-theme', activeTheme);
-        
-        let fillVal = ICONS === 'auto' ? (activeTheme === 'dark' ? 1 : 0) : parseInt(ICONS);
-        document.documentElement.style.setProperty('--fill', fillVal);
+        document.documentElement.style.setProperty('--fill', ICONS === 'auto' ? (activeTheme === 'dark' ? 1 : 0) : parseInt(ICONS));
+    }
+
+    function updateSkinUI() {
+        const setList = (SET === 'openmoji') ? SKIN_OPENMOJI : SKIN_NATIVE;
+        document.getElementById('skin-trigger').style.backgroundImage = `url('${setList[SKIN]}')`;
+        document.querySelectorAll('.skin-opt img').forEach((img, i) => img.src = setList[i]);
     }
 
     function getEmojiData(obj) {
@@ -203,7 +204,7 @@
         b.onclick = () => {
             navigator.clipboard.writeText(data.char);
             RECENT = [obj, ...RECENT.filter(r => r.hexcode !== obj.hexcode)].slice(0, 16);
-            localStorage.setItem('kenig_fav_i18n', JSON.stringify(RECENT));
+            localStorage.setItem('kenig_fav_i18n_v2', JSON.stringify(RECENT));
             if(!document.getElementById('search').value) render();
         };
         return b;
@@ -235,14 +236,14 @@
         });
     }
 
-    // Listeners
-    document.getElementById('locale-select').onchange = (e) => { LOCALE = e.target.value; localStorage.setItem('kenig_lang_v9', LOCALE); fetchData(); };
-    document.getElementById('theme-select').onchange = (e) => { THEME = e.target.value; localStorage.setItem('kenig_theme_v9', THEME); updateThemeAndIcons(); };
-    document.getElementById('icon-style-select').onchange = (e) => { ICONS = e.target.value; localStorage.setItem('kenig_icons_v9', ICONS); updateThemeAndIcons(); };
-    document.getElementById('set-select').onchange = (e) => { SET = e.target.value; localStorage.setItem('kenig_set_v9', SET); render(); };
+    // Handlers
+    document.getElementById('locale-select').onchange = (e) => { LOCALE = e.target.value; localStorage.setItem('kenig_lang_v2', LOCALE); fetchData(); };
+    document.getElementById('theme-select').onchange = (e) => { THEME = e.target.value; localStorage.setItem('kenig_theme_v2', THEME); updateThemeAndIcons(); };
+    document.getElementById('icon-style-select').onchange = (e) => { ICONS = e.target.value; localStorage.setItem('kenig_icons_v2', ICONS); updateThemeAndIcons(); };
+    document.getElementById('set-select').onchange = (e) => { SET = e.target.value; localStorage.setItem('kenig_set_v2', SET); updateSkinUI(); render(); };
     document.getElementById('nav-pos-select').onchange = (e) => { document.getElementById('cat-nav').classList.toggle('bottom', e.target.value === 'bottom'); };
     document.getElementById('prev-pos-select').onchange = (e) => { document.getElementById('picker-footer').classList.toggle('top', e.target.value === 'top'); };
-    document.getElementById('clear-history').onclick = () => { RECENT = []; localStorage.removeItem('kenig_fav_i18n'); render(); };
+    document.getElementById('clear-history').onclick = () => { RECENT = []; localStorage.removeItem('kenig_fav_i18n_v2'); render(); };
     document.getElementById('search').oninput = render;
     document.getElementById('cat-nav').onclick = e => {
         const b = e.target.closest('.nav-btn'); if (!b) return;
@@ -250,16 +251,15 @@
         if (target) document.getElementById('viewport').scrollTo({ top: target.offsetTop, behavior: 'smooth' });
     };
     document.getElementById('skin-trigger').onclick = (e) => { e.stopPropagation(); document.getElementById('skin-menu').classList.toggle('active'); };
-    document.querySelectorAll('.skin-opt').forEach(opt => opt.onclick = () => { SKIN = parseInt(opt.dataset.idx); localStorage.setItem('kenig_skin_v9', SKIN); document.getElementById('skin-trigger').style.backgroundImage = `url('/skintone/${opt.innerText.toLowerCase().replace(/ /g,'')}.png')`; render(); });
+    document.querySelectorAll('.skin-opt').forEach(opt => opt.onclick = () => { SKIN = parseInt(opt.dataset.idx); localStorage.setItem('kenig_skin_v2', SKIN); updateSkinUI(); render(); });
     window.onclick = () => document.getElementById('skin-menu').classList.remove('active');
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateThemeAndIcons);
 
-    // Init
+    // Initial Sync
     document.getElementById('locale-select').value = LOCALE;
     document.getElementById('theme-select').value = THEME;
     document.getElementById('icon-style-select').value = ICONS;
     document.getElementById('set-select').value = SET;
-    document.getElementById('skin-trigger').style.backgroundImage = `url('/skintone/default.png')`;
     updateThemeAndIcons();
     fetchData();
 </script>
