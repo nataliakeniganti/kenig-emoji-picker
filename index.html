@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kenig Emoji Picker</title>
+    <!-- Material Symbols Outlined Variable Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <style>
+        :root {
+            --w-picker: 360px;
+            --w-settings: 260px;
+            --h: 540px;
+            --bg: #ffffff;
+            --text: #1a1a1b;
+            --border: #f1f3f4;
+            --accent: #1a73e8;
+            --hover: #f1f3f4;
+            --icon-gray: #5f6368;
+            --fill: 0; /* Axis for Material Symbols */
+        }
+
+        /* SHARP UI - Absolute unrounded edges */
+        * { box-sizing: border-box; margin: 0; padding: 0; border-radius: 0 !important; }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: #eef1f4; display: flex; justify-content: center; align-items: center; height: 100vh; 
+            color: #333;
+        }
+
+        .main-wrapper { display: flex; gap: 24px; align-items: flex-start; }
+
+        /* --- PICKER COMPONENT --- */
+        .picker {
+            width: var(--w-picker);
+            height: var(--h);
+            background: var(--bg);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #bbb;
+            position: relative;
+        }
+
+        /* Navigation */
+        .nav { display: flex; padding: 4px 6px 0; border-bottom: 1px solid var(--border); justify-content: space-between; }
+        .nav.bottom { order: 4; border-bottom: none; border-top: 1px solid var(--border); padding: 0 6px 4px; }
+        
+        .nav-btn {
+            flex: 1; padding: 12px 0 14px; border: none; background: transparent; 
+            cursor: pointer; color: var(--icon-gray); position: relative; display: flex; justify-content: center;
+        }
+        .nav-btn.active { color: var(--accent); }
+        .nav-btn.active::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--accent);
+        }
+        .nav.bottom .nav-btn.active::after { bottom: auto; top: 0; }
+
+        .material-symbols-outlined { 
+            font-size: 22px; 
+            font-variation-settings: 'FILL' var(--fill), 'wght' 400, 'opsz' 20;
+        }
+        .active .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'opsz' 20; }
+
+        /* Search */
+        .search-area { padding: 12px 14px 6px; }
+        .search-box {
+            background: #f1f3f4; display: flex; align-items: center; padding: 0 12px; border: 1px solid transparent;
+        }
+        .search-box:focus-within { background: #fff; border-color: var(--accent); }
+        .search-box .search-icon { color: #5f6368; font-size: 18px; margin-right: 10px; }
+        #search { width: 100%; padding: 10px 0; border: none; background: transparent; font-size: 15px; outline: none; }
+
+        /* Grid Viewport */
+        .viewport { flex: 1; overflow-y: auto; padding: 0 14px 14px; scroll-behavior: smooth; }
+        .viewport::-webkit-scrollbar { width: 5px; }
+        .viewport::-webkit-scrollbar-thumb { background: #ccc; }
+
+        .section-title {
+            font-size: 12px; font-weight: 700; text-transform: uppercase; color: #888;
+            padding: 20px 4px 10px; background: #fff; position: sticky; top: 0; z-index: 10;
+        }
+        .emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 1px; }
+        
+        .emoji-btn {
+            width: 40px; height: 40px; font-size: 26px; border: none; background: transparent;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .emoji-btn:hover { background: var(--hover); }
+        .emoji-btn img { width: 28px; height: 28px; object-fit: contain; }
+
+        /* Footer / Preview */
+        .footer { height: 72px; padding: 0 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 14px; background: #fff; }
+        .footer.top { order: -1; border-top: none; border-bottom: 1px solid var(--border); }
+        #preview-char { font-size: 36px; min-width: 44px; text-align: center; display: flex; align-items: center; justify-content: center; }
+        #preview-char img { width: 38px; height: 38px; }
+        #preview-name { font-size: 15px; color: #70757a; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+        
+        /* Skin Tones */
+        .skin-trigger { width: 24px; height: 24px; border: 1px solid #ddd; cursor: pointer; background-size: cover; }
+        .skin-menu {
+            position: absolute; bottom: 72px; right: 0; background: #fff; box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            border: 1px solid #ddd; display: none; flex-direction: column; width: 175px; padding: 2px; z-index: 100;
+        }
+        .skin-menu.active { display: flex; }
+        .skin-opt { display: flex; align-items: center; gap: 10px; padding: 10px 12px; cursor: pointer; font-size: 13px; }
+        .skin-opt:hover { background: var(--hover); }
+        .skin-opt img { width: 18px; height: 18px; }
+
+        /* --- SETTINGS PANEL --- */
+        .settings-panel { width: var(--w-settings); display: flex; flex-direction: column; gap: 12px; }
+        .setting-row { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+        .setting-label { font-size: 16px; color: #444; font-weight: 500; }
+        
+        select {
+            width: 140px; padding: 6px 10px; font-size: 15px; border: 1px solid #d1d1d1; background: #fff; appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%234285f4%22%20d%3D%22M7%2010l5%205%205-5z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat; background-position: right 8px center; outline: none;
+        }
+        .bg-teal { background-color: #e0f7f4 !important; }
+
+        /* History Broom */
+        .broom-btn {
+            margin-top: 10px; width: 100%; padding: 15px; background: #fff; border: 1px solid #ddd;
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
+        }
+        .broom-btn:hover { background: #f8f8f8; }
+        .broom-btn img { width: 32px; height: 32px; transform: rotate(-45deg); }
+
+        #loader { position: absolute; inset: 0; background: #fff; z-index: 1000; display: flex; align-items: center; justify-content: center; color: #888; }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <!-- Picker -->
+    <div class="picker" id="emoji-picker">
+        <div id="loader">Fetching Unicode 17.0 Draft Data...</div>
+
+        <!-- Nav Matched to Image -->
+        <div class="nav" id="cat-nav">
+            <button class="nav-btn active" data-group="recent" title="Recent"><span class="material-symbols-outlined">schedule</span></button>
+            <button class="nav-btn" data-group="0" title="Smileys"><span class="material-symbols-outlined">sentiment_satisfied</span></button>
+            <button class="nav-btn" data-group="1" title="People"><span class="material-symbols-outlined">emoji_people</span></button>
+            <button class="nav-btn" data-group="3" title="Nature"><span class="material-symbols-outlined">emoji_nature</span></button>
+            <button class="nav-btn" data-group="4" title="Food"><span class="material-symbols-outlined">emoji_food_beverage</span></button>
+            <button class="nav-btn" data-group="6" title="Events"><span class="material-symbols-outlined">emoji_events</span></button>
+            <button class="nav-btn" data-group="5" title="Travel"><span class="material-symbols-outlined">emoji_transportation</span></button>
+            <button class="nav-btn" data-group="7" title="Objects"><span class="material-symbols-outlined">emoji_objects</span></button>
+            <button class="nav-btn" data-group="8" title="Symbols"><span class="material-symbols-outlined">emoji_symbols</span></button>
+            <button class="nav-btn" data-group="9" title="Flags"><span class="material-symbols-outlined">flag</span></button>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-area">
+            <div class="search-box">
+                <span class="material-symbols-outlined search-icon">search</span>
+                <input type="text" id="search" placeholder="Search emojis..." autocomplete="off">
+            </div>
+        </div>
+
+        <!-- Main Scroll Area -->
+        <div class="viewport" id="viewport">
+            <div id="section-recent">
+                <div class="section-title">Frequently used</div>
+                <div class="emoji-grid" id="grid-recent"></div>
+            </div>
+            <div id="main-groups"></div>
+        </div>
+
+        <!-- Preview Footer -->
+        <div class="footer" id="picker-footer">
+            <div id="preview-char">☝️</div>
+            <div id="preview-name">Pick an emoji...</div>
+            <div id="skin-trigger" class="skin-trigger"></div>
+            
+            <div id="skin-menu" class="skin-menu">
+                <div class="skin-opt" data-idx="0"><img src="/skintone/default.png"> Default</div>
+                <div class="skin-opt" data-idx="1"><img src="/skintone/light.png"> Light</div>
+                <div class="skin-opt" data-idx="2"><img src="/skintone/mediumlight.png"> Medium-Light</div>
+                <div class="skin-opt" data-idx="3"><img src="/skintone/medium.png"> Medium</div>
+                <div class="skin-opt" data-idx="4"><img src="/skintone/mediumdark.png"> Medium-Dark</div>
+                <div class="skin-opt" data-idx="5"><img src="/skintone/dark.png"> Dark</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="settings-panel">
+        <div class="setting-row">
+            <span class="setting-label">Set:</span>
+            <select id="set-select">
+                <option value="native">Native</option>
+                <option value="openmoji">OpenMoji</option>
+                <option value="google">Google</option>
+            </select>
+        </div>
+        <div class="setting-row"><span class="setting-label">Theme:</span><select><option>Auto</option><option>Light</option><option>Dark</option></select></div>
+        <div class="setting-row">
+            <span class="setting-label">Icons:</span>
+            <select id="icon-style-select">
+                <option value="0">Outlined</option>
+                <option value="1">Filled</option>
+            </select>
+        </div>
+        <div class="setting-row"><span class="setting-label">Emoji version:</span><select><option>17.0 (Latest)</option></select></div>
+        <div class="setting-row"><span class="setting-label">Locale (UI):</span><select class="bg-teal"><option>Polski</option><option>English</option></select></div>
+        <div class="setting-row"><span class="setting-label">Auto focus:</span><select><option>False</option><option>True</option></select></div>
+        <div class="setting-row">
+            <span class="setting-label">Nav position:</span>
+            <select id="nav-pos-select"><option value="top">Top</option><option value="bottom">Bottom</option></select>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">Preview position:</span>
+            <select id="prev-pos-select"><option value="bottom">Bottom</option><option value="top">Top</option></select>
+        </div>
+        <div class="setting-row"><span class="setting-label">Search position:</span><select class="bg-teal"><option>Static</option></select></div>
+        <div class="setting-row"><span class="setting-label">Skin tone position:</span><select><option>Preview</option></select></div>
+
+        <button class="broom-btn" id="clear-history" title="Clear History">
+            <img src="https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/72x72/1F9F9.png" alt="Clear">
+        </button>
+    </div>
+</div>
+
+<script>
+    // Asset URLs for latest emoji sets
+    const DATA_URL = 'https://cdn.jsdelivr.net/npm/emojibase-data@latest/en/data.json';
+    const MSG_URL = 'https://cdn.jsdelivr.net/npm/emojibase-data@latest/en/messages.json';
+    const OPENMOJI_BASE = 'https://raw.githubusercontent.com/hfg-gmuend/openmoji/refs/heads/master/color/72x72/';
+    const GOOGLE_BASE = 'https://raw.githubusercontent.com/googlefonts/noto-emoji/refs/heads/main/png/72/';
+
+    let ALL_DATA = [], GROUPS = {}, RECENT = JSON.parse(localStorage.getItem('fav_v17') || '[]');
+    let SKIN = parseInt(localStorage.getItem('user_skin_v17') || '0');
+    let SET = localStorage.getItem('user_set_v17') || 'native';
+
+    const skinImgs = ['/skintone/default.png', '/skintone/light.png', '/skintone/mediumlight.png', '/skintone/medium.png', '/skintone/mediumdark.png', '/skintone/dark.png'];
+
+    async function init() {
+        try {
+            const [d, m] = await Promise.all([fetch(DATA_URL).then(r=>r.json()), fetch(MSG_URL).then(r=>r.json())]);
+            ALL_DATA = d;
+            m.groups.forEach(g => GROUPS[g.order] = g.message);
+            
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('set-select').value = SET;
+            updateSkinUI();
+            render();
+        } catch (e) { document.getElementById('loader').textContent = "Connection Error"; }
+    }
+
+    function getEmojiData(obj) {
+        let current = obj;
+        if (SKIN !== 0 && obj.skins) current = obj.skins[SKIN - 1] || obj;
+        return { char: current.emoji, hex: current.hexcode, label: obj.label };
+    }
+
+    function getImgUrl(hex, set) {
+        if (set === 'openmoji') return `${OPENMOJI_BASE}${hex.toUpperCase()}.png`;
+        if (set === 'google') {
+            const googleHex = hex.toLowerCase().split('-').join('_');
+            return `${GOOGLE_BASE}emoji_u${googleHex}.png`;
+        }
+        return '';
+    }
+
+    function createBtn(obj) {
+        const data = getEmojiData(obj);
+        const b = document.createElement('button');
+        b.className = 'emoji-btn';
+        const url = getImgUrl(data.hex, SET);
+        
+        if (SET === 'native') b.textContent = data.char;
+        else b.innerHTML = `<img src="${url}" loading="lazy" onerror="this.parentElement.textContent='${data.char}'">`;
+
+        b.onmouseenter = () => {
+            const pc = document.getElementById('preview-char');
+            if (SET === 'native') pc.textContent = data.char;
+            else pc.innerHTML = `<img src="${url}">`;
+            document.getElementById('preview-name').textContent = data.label;
+        };
+
+        b.onclick = () => {
+            navigator.clipboard.writeText(data.char);
+            const idx = RECENT.findIndex(r => r.label === obj.label);
+            if(idx > -1) RECENT.splice(idx, 1);
+            RECENT.unshift(obj);
+            RECENT = RECENT.slice(0, 16);
+            localStorage.setItem('fav_v17', JSON.stringify(RECENT));
+            const currentName = document.getElementById('preview-name').textContent;
+            document.getElementById('preview-name').textContent = "Copied to clipboard!";
+            setTimeout(() => document.getElementById('preview-name').textContent = currentName, 1000);
+            if(!document.getElementById('search').value) render();
+        };
+        return b;
+    }
+
+    function render() {
+        const q = document.getElementById('search').value.toLowerCase();
+        const main = document.getElementById('main-groups');
+        const recDiv = document.getElementById('section-recent');
+        const recGrid = document.getElementById('grid-recent');
+        main.innerHTML = ''; recGrid.innerHTML = '';
+
+        if (!q && RECENT.length > 0) {
+            recDiv.style.display = 'block';
+            RECENT.forEach(o => recGrid.appendChild(createBtn(o)));
+        } else recDiv.style.display = 'none';
+
+        const grouped = {};
+        ALL_DATA.forEach(e => {
+            const match = !q || e.label.toLowerCase().includes(q) || (e.tags && e.tags.some(t => t.includes(q)));
+            if (match) {
+                if (!grouped[e.group]) grouped[e.group] = [];
+                grouped[e.group].push(e);
+            }
+        });
+
+        Object.keys(grouped).sort((a,b)=>a-b).forEach(gid => {
+            const sec = document.createElement('div');
+            sec.id = `scroll-group-${gid}`;
+            const tit = document.createElement('div');
+            tit.className = 'section-title';
+            tit.textContent = GROUPS[gid];
+            const grid = document.createElement('div');
+            grid.className = 'emoji-grid';
+            grouped[gid].forEach(o => grid.appendChild(createBtn(o)));
+            sec.append(tit, grid);
+            main.appendChild(sec);
+        });
+    }
+
+    function updateSkinUI() {
+        document.getElementById('skin-trigger').style.backgroundImage = `url('${skinImgs[SKIN]}')`;
+    }
+
+    // Settings Handlers
+    document.getElementById('set-select').onchange = (e) => { 
+        SET = e.target.value; 
+        localStorage.setItem('user_set_v17', SET);
+        render(); 
+    };
+    document.getElementById('icon-style-select').onchange = (e) => { document.documentElement.style.setProperty('--fill', e.target.value); };
+    document.getElementById('nav-pos-select').onchange = (e) => { document.getElementById('cat-nav').classList.toggle('bottom', e.target.value === 'bottom'); };
+    document.getElementById('prev-pos-select').onchange = (e) => { document.getElementById('picker-footer').classList.toggle('top', e.target.value === 'top'); };
+    document.getElementById('clear-history').onclick = () => { RECENT = []; localStorage.removeItem('fav_v17'); render(); };
+    document.getElementById('skin-trigger').onclick = (e) => { e.stopPropagation(); document.getElementById('skin-menu').classList.toggle('active'); };
+
+    document.querySelectorAll('.skin-opt').forEach(opt => {
+        opt.onclick = () => {
+            SKIN = parseInt(opt.dataset.idx);
+            localStorage.setItem('user_skin_v17', SKIN);
+            updateSkinUI();
+            render();
+        };
+    });
+
+    document.getElementById('search').oninput = render;
+    document.getElementById('cat-nav').onclick = e => {
+        const b = e.target.closest('.nav-btn');
+        if (!b) return;
+        document.querySelectorAll('.nav-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        const gid = b.dataset.group;
+        const target = gid === 'recent' ? document.getElementById('section-recent') : document.getElementById(`scroll-group-${gid}`);
+        if (target) document.getElementById('viewport').scrollTo({ top: target.offsetTop, behavior: 'smooth' });
+    };
+
+    window.onclick = () => document.getElementById('skin-menu').classList.remove('active');
+    init();
+</script>
+</body>
+</html>
