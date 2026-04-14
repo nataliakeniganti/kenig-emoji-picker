@@ -77,9 +77,12 @@
         }
         .emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 1px; }
         
-        .emoji-btn { width: 44px; height: 44px; font-size: 26px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .emoji-btn { width: 44px; height: 44px; font-size: 26px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden;}
         .emoji-btn:hover { background: var(--hover); }
-        .emoji-btn img { width: 32px; height: 32px; object-fit: contain; }
+        .emoji-btn img { width: 30px; height: 30px; object-fit: contain; }
+        
+        /* Placeholder for missing images */
+        .emoji-placeholder { font-size: 10px; font-weight: bold; background: #eee; color: #666; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; text-transform: uppercase; }
 
         .footer { height: 72px; padding: 0 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 14px; background: var(--bg); }
         .footer.top { order: -1; border-top: none; border-bottom: 1px solid var(--border); }
@@ -116,7 +119,7 @@
 
 <div class="main-wrapper">
     <div class="picker" id="emoji-picker">
-        <div id="loader">Syncing 2,500+ Emojis & Extras...</div>
+        <div id="loader">Syncing 2,500+ Emojis...</div>
 
         <div class="nav" id="cat-nav">
             <button class="nav-btn active" data-group="recent" title="Recent"><span class="material-symbols-outlined">schedule</span></button>
@@ -184,7 +187,7 @@
     const OM_BASE = 'https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/72x72/';
     const GOOGLE_BASE = 'https://raw.githubusercontent.com/googlefonts/noto-emoji/refs/heads/main/png/72/';
 
-    let ALL_DATA = [], GROUPS = {}, RECENT = JSON.parse(localStorage.getItem('kenig_fav_ext') || '[]');
+    let ALL_DATA = [], GROUPS = {}, RECENT = JSON.parse(localStorage.getItem('kenig_fav_ext_v2') || '[]');
     let SKIN = parseInt(localStorage.getItem('kenig_skin_ext') || '0'), SET = localStorage.getItem('kenig_set_ext') || 'native', THEME = localStorage.getItem('kenig_theme_ext') || 'auto';
 
     const skinImgs = ['/skintone/default.png', '/skintone/light.png', '/skintone/mediumlight.png', '/skintone/medium.png', '/skintone/mediumdark.png', '/skintone/dark.png'];
@@ -202,15 +205,13 @@
             m.groups.forEach(g => GROUPS[g.order] = g.message);
             GROUPS[99] = "Extras";
 
-            // Parse CSVs
-            const extras = [eom, euni].flatMap(csv => parseCSV(csv));
-            ALL_DATA.push(...extras);
+            ALL_DATA.push(...parseCSV(eom, true), ...parseCSV(euni, true));
 
             document.getElementById('loader').style.display = 'none';
             document.getElementById('set-select').value = SET;
             document.getElementById('theme-select').value = THEME;
             updateTheme(); updateSkinUI(); render();
-        } catch (e) { document.getElementById('loader').textContent = "Error Syncing Data"; console.error(e); }
+        } catch (e) { document.getElementById('loader').textContent = "Error Syncing Data"; }
     }
 
     function parseCSV(text) {
@@ -219,11 +220,11 @@
             if (cols.length < 2) return null;
             const hex = cols[0].trim().toUpperCase();
             let char = '';
-            try { char = hex.split('-').map(h => String.fromCodePoint(parseInt(h, 16))).join(''); } catch(e) { char = '?'; }
+            try { char = hex.split('-').map(h => String.fromCodePoint(parseInt(h, 16))).join(''); } catch(e) { char = ''; }
             return {
                 emoji: char,
                 hexcode: hex,
-                label: cols[1].replace(/"/g, ''),
+                label: (cols[1] || 'Extra').replace(/"/g, ''),
                 group: 99,
                 tags: cols[2] ? cols[2].split(' ') : [],
                 isExtra: true
@@ -249,25 +250,46 @@
         b.className = 'emoji-btn';
         const url = getImgUrl(data.hex, SET);
         
-        // Logic: Extras often don't have Native glyphs or Google PNGs, so fallback to OpenMoji
-        if (SET === 'native' && !data.isExtra) b.textContent = data.char;
-        else if (SET === 'google' && !data.isExtra) b.innerHTML = `<img src="${url}" loading="lazy">`;
-        else b.innerHTML = `<img src="${getImgUrl(data.hex, 'openmoji')}" loading="lazy">`;
+        const fallback = () => {
+            if (data.char && data.char !== '') {
+                b.innerHTML = data.char;
+            } else {
+                b.innerHTML = `<div class="emoji-placeholder">${data.label.charAt(0)}</div>`;
+            }
+        };
+
+        if (SET === 'native' && !data.isExtra) {
+            b.textContent = data.char;
+        } else {
+            const img = document.createElement('img');
+            img.loading = "lazy";
+            img.src = (SET === 'google' && !data.isExtra) ? url : getImgUrl(data.hex, 'openmoji');
+            img.onerror = fallback;
+            b.appendChild(img);
+        }
 
         b.onmouseenter = () => {
             const pc = document.getElementById('preview-char');
             if (SET === 'native' && !data.isExtra) pc.textContent = data.char;
-            else pc.innerHTML = `<img src="${data.isExtra ? getImgUrl(data.hex, 'openmoji') : url || getImgUrl(data.hex, 'openmoji')}">`;
+            else {
+                const pImg = document.createElement('img');
+                pImg.src = (SET === 'google' && !data.isExtra) ? getImgUrl(data.hex, 'google') : getImgUrl(data.hex, 'openmoji');
+                pImg.onerror = () => {
+                    pc.innerHTML = data.char || `<div class="emoji-placeholder">${data.label.charAt(0)}</div>`;
+                };
+                pc.innerHTML = '';
+                pc.appendChild(pImg);
+            }
             document.getElementById('preview-name').textContent = data.label;
         };
 
         b.onclick = () => {
-            navigator.clipboard.writeText(data.char);
+            if (data.char) navigator.clipboard.writeText(data.char);
             const idx = RECENT.findIndex(r => r.hexcode === obj.hexcode);
             if(idx > -1) RECENT.splice(idx, 1);
             RECENT.unshift(obj);
             RECENT = RECENT.slice(0, 16);
-            localStorage.setItem('kenig_fav_ext', JSON.stringify(RECENT));
+            localStorage.setItem('kenig_fav_ext_v2', JSON.stringify(RECENT));
             const cur = document.getElementById('preview-name').textContent;
             document.getElementById('preview-name').textContent = "Copied!";
             setTimeout(() => document.getElementById('preview-name').textContent = cur, 1000);
@@ -323,7 +345,7 @@
     document.getElementById('icon-style-select').onchange = (e) => { document.documentElement.style.setProperty('--fill', e.target.value); };
     document.getElementById('nav-pos-select').onchange = (e) => { document.getElementById('cat-nav').classList.toggle('bottom', e.target.value === 'bottom'); };
     document.getElementById('prev-pos-select').onchange = (e) => { document.getElementById('picker-footer').classList.toggle('top', e.target.value === 'top'); };
-    document.getElementById('clear-history').onclick = () => { RECENT = []; localStorage.removeItem('kenig_fav_ext'); render(); };
+    document.getElementById('clear-history').onclick = () => { RECENT = []; localStorage.removeItem('fav_fav_ext_v2'); render(); };
     document.getElementById('skin-trigger').onclick = (e) => { e.stopPropagation(); document.getElementById('skin-menu').classList.toggle('active'); };
     document.querySelectorAll('.skin-opt').forEach(opt => { opt.onclick = () => { SKIN = parseInt(opt.dataset.idx); localStorage.setItem('kenig_skin_ext', SKIN); updateSkinUI(); render(); }; });
     document.getElementById('search').oninput = render;
