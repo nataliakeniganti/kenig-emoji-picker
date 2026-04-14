@@ -7,9 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
     <style>
         :root {
-            /* Layout Constants */
-            --w-picker: 360px; --w-settings: 260px; --h: 530px; --accent: #1a73e8; --fill: 0;
-            /* Light Theme */
+            --w-picker: 360px; --w-settings: 260px; --h: 540px; --accent: #1a73e8; --fill: 0;
             --body-bg: #eef1f4; --bg: #ffffff; --text-main: #1a1a1b; --text-muted: #5f6368;
             --text-header: #888; --border: #f1f3f4; --border-outer: #bbb; --hover: #f1f3f4;
             --input-bg: #f1f3f4; --shadow: rgba(0,0,0,0.15);
@@ -21,7 +19,6 @@
             --input-bg: #2d2d2d; --shadow: rgba(0,0,0,0.5);
         }
 
-        /* SHARP UI - Absolute unrounded edges */
         * { box-sizing: border-box; margin: 0; padding: 0; border-radius: 0 !important; }
         
         body { 
@@ -45,7 +42,7 @@
         .nav-btn.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--accent); }
         .nav.bottom .nav-btn.active::after { bottom: auto; top: 0; }
 
-        .material-symbols-outlined { font-size: 22px; font-variation-settings: 'FILL' var(--fill), 'wght' 400, 'opsz' 20; }
+        .material-symbols-outlined { font-size: 22px; font-variation-settings: 'FILL' var(--fill), 'wght' 400, 'opsz' 20; transition: font-variation-settings 0.2s; }
         .active .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
 
         .search-area { padding: 12px 14px 6px; flex-shrink: 0; }
@@ -76,44 +73,44 @@
         .skin-opt:hover { background: var(--hover); }
         .skin-opt img { width: 18px; height: 18px; }
 
-        .settings-panel { width: var(--w-settings); display: flex; flex-direction: column; gap: 12px; }
+        .settings-panel { width: var(--w-settings); display: flex; flex-direction: column; gap: 10px; }
         .setting-row { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
         .setting-label { font-size: 16px; color: var(--text-main); font-weight: 500; }
         select { width: 140px; padding: 6px 10px; font-size: 15px; border: 1px solid var(--border-outer); background: var(--bg); color: var(--text-main); appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%234285f4%22%20d%3D%22M7%2010l5%205%205-5z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 8px center; outline: none; }
-        .bg-teal { background-color: rgba(0, 150, 136, 0.1) !important; }
+        .bg-teal { background-color: #e0f7f4 !important; }
+        [data-theme="dark"] .bg-teal { background-color: #004d40 !important; }
 
         .broom-btn { margin-top: 10px; width: 100%; padding: 15px; background: var(--bg); border: 1px solid var(--border-outer); display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .broom-btn:hover { background: var(--hover); }
         .broom-btn img { width: 32px; height: 32px; transform: rotate(-45deg); }
         .attribution { font-size: 11px; text-align: center; margin-top: 10px; color: var(--text-muted); opacity: 0.8; }
-        #loader { position: absolute; inset: 0; background: var(--bg); z-index: 1000; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+        #loader { position: absolute; inset: 0; background: var(--bg); z-index: 1000; display: flex; align-items: center; justify-content: center; color: var(--text-muted); text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="main-wrapper">
     <div class="picker" id="emoji-picker">
-        <div id="loader">Loading v17.0 Stable Data...</div>
+        <div id="loader">Loading...</div>
         <div class="nav" id="cat-nav">
-            <button class="nav-btn active" data-group="recent" title="Recent"><span class="material-symbols-outlined">schedule</span></button>
-            <button class="nav-btn" data-group="0" title="Smileys"><span class="material-symbols-outlined">sentiment_satisfied</span></button>
-            <button class="nav-btn" data-group="1" title="People"><span class="material-symbols-outlined">emoji_people</span></button>
-            <button class="nav-btn" data-group="3" title="Nature"><span class="material-symbols-outlined">emoji_nature</span></button>
-            <button class="nav-btn" data-group="4" title="Food"><span class="material-symbols-outlined">emoji_food_beverage</span></button>
-            <button class="nav-btn" data-group="6" title="Events"><span class="material-symbols-outlined">emoji_events</span></button>
-            <button class="nav-btn" data-group="5" title="Travel"><span class="material-symbols-outlined">emoji_transportation</span></button>
-            <button class="nav-btn" data-group="7" title="Objects"><span class="material-symbols-outlined">emoji_objects</span></button>
-            <button class="nav-btn" data-group="8" title="Symbols"><span class="material-symbols-outlined">emoji_symbols</span></button>
-            <button class="nav-btn" data-group="9" title="Flags"><span class="material-symbols-outlined">flag</span></button>
+            <button class="nav-btn active" data-group="recent"><span class="material-symbols-outlined">schedule</span></button>
+            <button class="nav-btn" data-group="0"><span class="material-symbols-outlined">sentiment_satisfied</span></button>
+            <button class="nav-btn" data-group="1"><span class="material-symbols-outlined">emoji_people</span></button>
+            <button class="nav-btn" data-group="3"><span class="material-symbols-outlined">emoji_nature</span></button>
+            <button class="nav-btn" data-group="4"><span class="material-symbols-outlined">emoji_food_beverage</span></button>
+            <button class="nav-btn" data-group="6"><span class="material-symbols-outlined">emoji_events</span></button>
+            <button class="nav-btn" data-group="5"><span class="material-symbols-outlined">emoji_transportation</span></button>
+            <button class="nav-btn" data-group="7"><span class="material-symbols-outlined">emoji_objects</span></button>
+            <button class="nav-btn" data-group="8"><span class="material-symbols-outlined">emoji_symbols</span></button>
+            <button class="nav-btn" data-group="9"><span class="material-symbols-outlined">flag</span></button>
         </div>
-        <div class="search-area"><div class="search-box"><span class="material-symbols-outlined search-icon">search</span><input type="text" id="search" placeholder="Search emojis..." autocomplete="off"></div></div>
+        <div class="search-area"><div class="search-box"><span class="material-symbols-outlined search-icon" style="font-variation-settings:'FILL' 0">search</span><input type="text" id="search" placeholder="Search..." autocomplete="off"></div></div>
         <div class="viewport" id="viewport">
-            <div id="section-recent"><div class="section-title">Frequently used</div><div class="emoji-grid" id="grid-recent"></div></div>
+            <div id="section-recent"><div class="section-title" id="title-recent">Frequently used</div><div class="emoji-grid" id="grid-recent"></div></div>
             <div id="main-groups"></div>
         </div>
         <div class="footer" id="picker-footer">
             <div id="preview-char">✨</div>
-            <div id="preview-name">Select an emoji</div>
+            <div id="preview-name" id="text-placeholder">Select an emoji</div>
             <div id="skin-trigger" class="skin-trigger"></div>
             <div id="skin-menu" class="skin-menu">
                 <div class="skin-opt" data-idx="0"><img src="/skintone/default.png"> Default</div>
@@ -127,49 +124,65 @@
     </div>
 
     <div class="settings-panel">
-        <div class="setting-row"><span class="setting-label">Set:</span><select id="set-select"><option value="native">Native</option><option value="openmoji">OpenMoji</option><option value="google">Google</option></select></div>
-        <div class="setting-row"><span class="setting-label">Theme:</span><select id="theme-select"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
-        <div class="setting-row"><span class="setting-label">Icons:</span><select id="icon-style-select"><option value="0">Outlined</option><option value="1">Filled</option></select></div>
-        <div class="setting-row"><span class="setting-label">Emoji version:</span><select><option>17.0</option></select></div>
-        <div class="setting-row"><span class="setting-label">Locale (UI):</span><select class="bg-teal"><option>Polski</option><option>English</option></select></div>
-        <div class="setting-row"><span class="setting-label">Nav position:</span><select id="nav-pos-select"><option value="top">Top</option><option value="bottom">Bottom</option></select></div>
-        <div class="setting-row"><span class="setting-label">Preview position:</span><select id="prev-pos-select"><option value="bottom">Bottom</option><option value="top">Top</option></select></div>
-        <button class="broom-btn" id="clear-history" title="Clear History"><img src="https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/72x72/1F9F9.png" alt="Clear"></button>
+        <div class="setting-row"><span class="setting-label" id="lbl-set">Set:</span><select id="set-select"><option value="native">Native</option><option value="openmoji">OpenMoji</option><option value="google">Google</option></select></div>
+        <div class="setting-row"><span class="setting-label" id="lbl-theme">Theme:</span><select id="theme-select"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+        <div class="setting-row"><span class="setting-label" id="lbl-icons">Icons:</span><select id="icon-style-select"><option value="auto">Auto</option><option value="1">Filled</option><option value="0">Outlined</option></select></div>
+        <div class="setting-row"><span class="setting-label" id="lbl-version">Emoji version:</span><select><option>17.0 (Stable)</option></select></div>
+        <div class="setting-row"><span class="setting-label" id="lbl-locale">Locale (UI):</span><select id="locale-select" class="bg-teal"><option value="en">English</option><option value="pl">Polski</option></select></div>
+        <div class="setting-row"><span class="setting-label" id="lbl-nav">Nav position:</span><select id="nav-pos-select"><option value="top">Top</option><option value="bottom">Bottom</option></select></div>
+        <div class="setting-row"><span class="setting-label" id="lbl-prev">Preview position:</span><select id="prev-pos-select"><option value="bottom">Bottom</option><option value="top">Top</option></select></div>
+
+        <button class="broom-btn" id="clear-history"><img src="https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/72x72/1F9F9.png"></button>
         <div class="attribution">Created by AI Agent</div>
     </div>
 </div>
 
 <script>
-    const DATA_URL = 'https://cdn.jsdelivr.net/npm/emojibase-data@latest/en/data.json';
-    const MSG_URL = 'https://cdn.jsdelivr.net/npm/emojibase-data@latest/en/messages.json';
-    const OM_BASE = 'https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/72x72/';
-    const GOOGLE_BASE = 'https://raw.githubusercontent.com/googlefonts/noto-emoji/refs/heads/main/png/72/';
+    const I18N = {
+        en: { search: "Search emojis...", recent: "Frequently used", placeholder: "Select an emoji", set: "Set:", theme: "Theme:", icons: "Icons:", version: "Emoji version:", locale: "Locale (UI):", nav: "Nav position:", prev: "Preview position:" },
+        pl: { search: "Szukaj emoji...", recent: "Często używane", placeholder: "Wybierz emoji", set: "Zestaw:", theme: "Motyw:", icons: "Ikony:", version: "Wersja emoji:", locale: "Język (UI):", nav: "Pozycja nawigacji:", prev: "Pozycja podglądu:" }
+    };
 
-    let ALL_DATA = [], GROUPS = {}, RECENT = JSON.parse(localStorage.getItem('fav_final_v1') || '[]');
-    let SKIN = parseInt(localStorage.getItem('user_skin_v1') || '0'), SET = localStorage.getItem('user_set_v1') || 'native', THEME = localStorage.getItem('user_theme_v1') || 'auto';
+    let ALL_DATA = [], GROUPS = {}, RECENT = JSON.parse(localStorage.getItem('kenig_fav_i18n') || '[]');
+    let SKIN = parseInt(localStorage.getItem('kenig_skin_v9') || '0'), SET = localStorage.getItem('kenig_set_v9') || 'native';
+    let THEME = localStorage.getItem('kenig_theme_v9') || 'auto', ICONS = localStorage.getItem('kenig_icons_v9') || 'auto', LOCALE = localStorage.getItem('kenig_lang_v9') || 'en';
 
-    const skinImgs = ['/skintone/default.png', '/skintone/light.png', '/skintone/mediumlight.png', '/skintone/medium.png', '/skintone/mediumdark.png', '/skintone/dark.png'];
-
-    async function init() {
-        try {
-            const [d, m] = await Promise.all([fetch(DATA_URL).then(r=>r.json()), fetch(MSG_URL).then(r=>r.json())]);
-            ALL_DATA = d;
-            m.groups.forEach(g => GROUPS[g.order] = g.message);
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('set-select').value = SET;
-            document.getElementById('theme-select').value = THEME;
-            updateTheme(); updateSkinUI(); render();
-        } catch (e) { document.getElementById('loader').textContent = "Connection Error"; }
+    async function fetchData() {
+        document.getElementById('loader').style.display = 'flex';
+        const [d, m] = await Promise.all([
+            fetch(`https://cdn.jsdelivr.net/npm/emojibase-data@latest/${LOCALE}/data.json`).then(r=>r.json()),
+            fetch(`https://cdn.jsdelivr.net/npm/emojibase-data@latest/${LOCALE}/messages.json`).then(r=>r.json())
+        ]);
+        ALL_DATA = d;
+        m.groups.forEach(g => GROUPS[g.order] = g.message);
+        document.getElementById('loader').style.display = 'none';
+        updateUIStrings(); render();
     }
 
-    function updateTheme() {
-        let t = THEME === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : THEME;
-        document.documentElement.setAttribute('data-theme', t);
+    function updateUIStrings() {
+        const t = I18N[LOCALE];
+        document.getElementById('search').placeholder = t.search;
+        document.getElementById('title-recent').textContent = t.recent;
+        document.getElementById('preview-name').textContent = t.placeholder;
+        document.getElementById('lbl-set').textContent = t.set;
+        document.getElementById('lbl-theme').textContent = t.theme;
+        document.getElementById('lbl-icons').textContent = t.icons;
+        document.getElementById('lbl-version').textContent = t.version;
+        document.getElementById('lbl-locale').textContent = t.locale;
+        document.getElementById('lbl-nav').textContent = t.nav;
+        document.getElementById('lbl-prev').textContent = t.prev;
+    }
+
+    function updateThemeAndIcons() {
+        let activeTheme = THEME === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : THEME;
+        document.documentElement.setAttribute('data-theme', activeTheme);
+        
+        let fillVal = ICONS === 'auto' ? (activeTheme === 'dark' ? 1 : 0) : parseInt(ICONS);
+        document.documentElement.style.setProperty('--fill', fillVal);
     }
 
     function getEmojiData(obj) {
-        let current = obj;
-        if (SKIN !== 0 && obj.skins) current = obj.skins[SKIN - 1] || obj;
+        let current = (SKIN !== 0 && obj.skins) ? (obj.skins[SKIN - 1] || obj) : obj;
         return { char: current.emoji, hex: current.hexcode, label: obj.label };
     }
 
@@ -177,29 +190,20 @@
         const data = getEmojiData(obj);
         const b = document.createElement('button');
         b.className = 'emoji-btn';
-        const gHex = data.hex.toLowerCase().replace(/-/g, '_');
-        const imgUrl = (SET === 'google') ? `${GOOGLE_BASE}emoji_u${gHex}.png` : `${OM_BASE}${data.hex.toUpperCase()}.png`;
+        const imgUrl = (SET === 'google') ? `https://raw.githubusercontent.com/googlefonts/noto-emoji/refs/heads/main/png/72/emoji_u${data.hex.toLowerCase().replace(/-/g, '_')}.png` : `https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/72x72/${data.hex.toUpperCase()}.png`;
         
         if (SET === 'native') b.textContent = data.char;
         else b.innerHTML = `<img src="${imgUrl}" loading="lazy" onerror="this.parentElement.textContent='${data.char}'">`;
 
         b.onmouseenter = () => {
             const pc = document.getElementById('preview-char');
-            if (SET === 'native') pc.textContent = data.char;
-            else pc.innerHTML = `<img src="${imgUrl}">`;
+            if (SET === 'native') pc.textContent = data.char; else pc.innerHTML = `<img src="${imgUrl}">`;
             document.getElementById('preview-name').textContent = data.label;
         };
-
         b.onclick = () => {
             navigator.clipboard.writeText(data.char);
-            const idx = RECENT.findIndex(r => r.hexcode === obj.hexcode);
-            if(idx > -1) RECENT.splice(idx, 1);
-            RECENT.unshift(obj);
-            RECENT = RECENT.slice(0, 16);
-            localStorage.setItem('fav_final_v1', JSON.stringify(RECENT));
-            const cur = document.getElementById('preview-name').textContent;
-            document.getElementById('preview-name').textContent = "Copied!";
-            setTimeout(() => document.getElementById('preview-name').textContent = cur, 1000);
+            RECENT = [obj, ...RECENT.filter(r => r.hexcode !== obj.hexcode)].slice(0, 16);
+            localStorage.setItem('kenig_fav_i18n', JSON.stringify(RECENT));
             if(!document.getElementById('search').value) render();
         };
         return b;
@@ -212,54 +216,52 @@
         const recGrid = document.getElementById('grid-recent');
         main.innerHTML = ''; recGrid.innerHTML = '';
 
-        if (!q && RECENT.length > 0) {
-            recDiv.style.display = 'block';
-            RECENT.forEach(o => recGrid.appendChild(createBtn(o)));
-        } else recDiv.style.display = 'none';
+        if (!q && RECENT.length > 0) { recDiv.style.display = 'block'; RECENT.forEach(o => recGrid.appendChild(createBtn(o))); }
+        else recDiv.style.display = 'none';
 
         const grouped = {};
         ALL_DATA.forEach(e => {
-            const match = !q || e.label.toLowerCase().includes(q) || (e.tags && e.tags.some(t => t.includes(q)));
-            if (match) {
-                if (!grouped[e.group]) grouped[e.group] = [];
-                grouped[e.group].push(e);
+            if (!q || e.label.toLowerCase().includes(q) || (e.tags && e.tags.some(t => t.includes(q)))) {
+                if (!grouped[e.group]) grouped[e.group] = []; grouped[e.group].push(e);
             }
         });
 
         Object.keys(grouped).sort((a,b)=>a-b).forEach(gid => {
-            const sec = document.createElement('div');
-            sec.id = `scroll-group-${gid}`;
-            const tit = document.createElement('div');
-            tit.className = 'section-title';
-            tit.textContent = GROUPS[gid];
-            const grid = document.createElement('div');
-            grid.className = 'emoji-grid';
+            const sec = document.createElement('div'); sec.id = `scroll-group-${gid}`;
+            const tit = document.createElement('div'); tit.className = 'section-title'; tit.textContent = GROUPS[gid];
+            const grid = document.createElement('div'); grid.className = 'emoji-grid';
             grouped[gid].forEach(o => grid.appendChild(createBtn(o)));
-            sec.append(tit, grid);
-            main.appendChild(sec);
+            sec.append(tit, grid); main.appendChild(sec);
         });
     }
 
-    function updateSkinUI() { document.getElementById('skin-trigger').style.backgroundImage = `url('${skinImgs[SKIN]}')`; }
-
-    document.getElementById('theme-select').onchange = (e) => { THEME = e.target.value; localStorage.setItem('user_theme_v1', THEME); updateTheme(); };
-    document.getElementById('set-select').onchange = (e) => { SET = e.target.value; localStorage.setItem('user_set_v1', SET); render(); };
-    document.getElementById('icon-style-select').onchange = (e) => { document.documentElement.style.setProperty('--fill', e.target.value); };
+    // Listeners
+    document.getElementById('locale-select').onchange = (e) => { LOCALE = e.target.value; localStorage.setItem('kenig_lang_v9', LOCALE); fetchData(); };
+    document.getElementById('theme-select').onchange = (e) => { THEME = e.target.value; localStorage.setItem('kenig_theme_v9', THEME); updateThemeAndIcons(); };
+    document.getElementById('icon-style-select').onchange = (e) => { ICONS = e.target.value; localStorage.setItem('kenig_icons_v9', ICONS); updateThemeAndIcons(); };
+    document.getElementById('set-select').onchange = (e) => { SET = e.target.value; localStorage.setItem('kenig_set_v9', SET); render(); };
     document.getElementById('nav-pos-select').onchange = (e) => { document.getElementById('cat-nav').classList.toggle('bottom', e.target.value === 'bottom'); };
     document.getElementById('prev-pos-select').onchange = (e) => { document.getElementById('picker-footer').classList.toggle('top', e.target.value === 'top'); };
-    document.getElementById('clear-history').onclick = () => { RECENT = []; localStorage.removeItem('fav_final_v1'); render(); };
-    document.getElementById('skin-trigger').onclick = (e) => { e.stopPropagation(); document.getElementById('skin-menu').classList.toggle('active'); };
-    document.querySelectorAll('.skin-opt').forEach(opt => { opt.onclick = () => { SKIN = parseInt(opt.dataset.idx); localStorage.setItem('user_skin_v1', SKIN); updateSkinUI(); render(); }; });
+    document.getElementById('clear-history').onclick = () => { RECENT = []; localStorage.removeItem('kenig_fav_i18n'); render(); };
     document.getElementById('search').oninput = render;
     document.getElementById('cat-nav').onclick = e => {
         const b = e.target.closest('.nav-btn'); if (!b) return;
-        document.querySelectorAll('.nav-btn').forEach(x => x.classList.remove('active')); b.classList.add('active');
         const target = b.dataset.group === 'recent' ? document.getElementById('section-recent') : document.getElementById(`scroll-group-${b.dataset.group}`);
         if (target) document.getElementById('viewport').scrollTo({ top: target.offsetTop, behavior: 'smooth' });
     };
+    document.getElementById('skin-trigger').onclick = (e) => { e.stopPropagation(); document.getElementById('skin-menu').classList.toggle('active'); };
+    document.querySelectorAll('.skin-opt').forEach(opt => opt.onclick = () => { SKIN = parseInt(opt.dataset.idx); localStorage.setItem('kenig_skin_v9', SKIN); document.getElementById('skin-trigger').style.backgroundImage = `url('/skintone/${opt.innerText.toLowerCase().replace(/ /g,'')}.png')`; render(); });
     window.onclick = () => document.getElementById('skin-menu').classList.remove('active');
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (THEME === 'auto') updateTheme(); });
-    init();
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateThemeAndIcons);
+
+    // Init
+    document.getElementById('locale-select').value = LOCALE;
+    document.getElementById('theme-select').value = THEME;
+    document.getElementById('icon-style-select').value = ICONS;
+    document.getElementById('set-select').value = SET;
+    document.getElementById('skin-trigger').style.backgroundImage = `url('/skintone/default.png')`;
+    updateThemeAndIcons();
+    fetchData();
 </script>
 </body>
 </html>
