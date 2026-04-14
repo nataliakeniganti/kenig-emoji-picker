@@ -145,10 +145,11 @@
 
     const SKIN_NATIVE = ['default','light','mediumlight','medium','mediumdark','dark'].map(n => `/skintone/${n}.png`);
     const SKIN_OPENMOJI = ['default','light','mediumlight','medium','mediumdark','dark'].map(n => `/skintone/openmoji_${n}.svg`);
+    const SKIN_GOOGLE = ['default','light','mediumlight','medium','mediumdark','dark'].map(n => `/skintone/google_${n}.png`);
 
-    let ALL_DATA = [], GROUPS = {}, RECENT = JSON.parse(localStorage.getItem('kenig_fav_i18n_v2') || '[]');
-    let SKIN = parseInt(localStorage.getItem('kenig_skin_v2') || '0'), SET = localStorage.getItem('kenig_set_v2') || 'native';
-    let THEME = localStorage.getItem('kenig_theme_v2') || 'auto', ICONS = localStorage.getItem('kenig_icons_v2') || 'auto', LOCALE = localStorage.getItem('kenig_lang_v2') || 'en';
+    let ALL_DATA = [], GROUPS = {}, RECENT = JSON.parse(localStorage.getItem('kenig_fav_final') || '[]');
+    let SKIN = parseInt(localStorage.getItem('kenig_skin') || '0'), SET = localStorage.getItem('kenig_set') || 'native';
+    let THEME = localStorage.getItem('kenig_theme') || 'auto', ICONS = localStorage.getItem('kenig_icons') || 'auto', LOCALE = localStorage.getItem('kenig_lang') || 'en';
 
     async function fetchData() {
         document.getElementById('loader').style.display = 'flex';
@@ -177,7 +178,11 @@
     }
 
     function updateSkinUI() {
-        const setList = (SET === 'openmoji') ? SKIN_OPENMOJI : SKIN_NATIVE;
+        let setList;
+        if (SET === 'openmoji') setList = SKIN_OPENMOJI;
+        else if (SET === 'google') setList = SKIN_GOOGLE;
+        else setList = SKIN_NATIVE;
+
         document.getElementById('skin-trigger').style.backgroundImage = `url('${setList[SKIN]}')`;
         document.querySelectorAll('.skin-opt img').forEach((img, i) => img.src = setList[i]);
     }
@@ -204,7 +209,7 @@
         b.onclick = () => {
             navigator.clipboard.writeText(data.char);
             RECENT = [obj, ...RECENT.filter(r => r.hexcode !== obj.hexcode)].slice(0, 16);
-            localStorage.setItem('kenig_fav_i18n_v2', JSON.stringify(RECENT));
+            localStorage.setItem('kenig_fav_final', JSON.stringify(RECENT));
             if(!document.getElementById('search').value) render();
         };
         return b;
@@ -236,14 +241,14 @@
         });
     }
 
-    // Handlers
-    document.getElementById('locale-select').onchange = (e) => { LOCALE = e.target.value; localStorage.setItem('kenig_lang_v2', LOCALE); fetchData(); };
-    document.getElementById('theme-select').onchange = (e) => { THEME = e.target.value; localStorage.setItem('kenig_theme_v2', THEME); updateThemeAndIcons(); };
-    document.getElementById('icon-style-select').onchange = (e) => { ICONS = e.target.value; localStorage.setItem('kenig_icons_v2', ICONS); updateThemeAndIcons(); };
-    document.getElementById('set-select').onchange = (e) => { SET = e.target.value; localStorage.setItem('kenig_set_v2', SET); updateSkinUI(); render(); };
+    // Listeners
+    document.getElementById('locale-select').onchange = (e) => { LOCALE = e.target.value; localStorage.setItem('kenig_lang', LOCALE); fetchData(); };
+    document.getElementById('theme-select').onchange = (e) => { THEME = e.target.value; localStorage.setItem('kenig_theme', THEME); updateThemeAndIcons(); };
+    document.getElementById('icon-style-select').onchange = (e) => { ICONS = e.target.value; localStorage.setItem('kenig_icons', ICONS); updateThemeAndIcons(); };
+    document.getElementById('set-select').onchange = (e) => { SET = e.target.value; localStorage.setItem('kenig_set', SET); updateSkinUI(); render(); };
     document.getElementById('nav-pos-select').onchange = (e) => { document.getElementById('cat-nav').classList.toggle('bottom', e.target.value === 'bottom'); };
     document.getElementById('prev-pos-select').onchange = (e) => { document.getElementById('picker-footer').classList.toggle('top', e.target.value === 'top'); };
-    document.getElementById('clear-history').onclick = () => { RECENT = []; localStorage.removeItem('kenig_fav_i18n_v2'); render(); };
+    document.getElementById('clear-history').onclick = () => { RECENT = []; localStorage.removeItem('kenig_fav_final'); render(); };
     document.getElementById('search').oninput = render;
     document.getElementById('cat-nav').onclick = e => {
         const b = e.target.closest('.nav-btn'); if (!b) return;
@@ -251,11 +256,11 @@
         if (target) document.getElementById('viewport').scrollTo({ top: target.offsetTop, behavior: 'smooth' });
     };
     document.getElementById('skin-trigger').onclick = (e) => { e.stopPropagation(); document.getElementById('skin-menu').classList.toggle('active'); };
-    document.querySelectorAll('.skin-opt').forEach(opt => opt.onclick = () => { SKIN = parseInt(opt.dataset.idx); localStorage.setItem('kenig_skin_v2', SKIN); updateSkinUI(); render(); });
+    document.querySelectorAll('.skin-opt').forEach(opt => opt.onclick = () => { SKIN = parseInt(opt.dataset.idx); localStorage.setItem('kenig_skin', SKIN); updateSkinUI(); render(); });
     window.onclick = () => document.getElementById('skin-menu').classList.remove('active');
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateThemeAndIcons);
 
-    // Initial Sync
+    // Bootstrap
     document.getElementById('locale-select').value = LOCALE;
     document.getElementById('theme-select').value = THEME;
     document.getElementById('icon-style-select').value = ICONS;
