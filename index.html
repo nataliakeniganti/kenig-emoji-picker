@@ -8,9 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
     <style>
         :root {
-            /* Layout */
             --w-picker: 360px; --w-settings: 260px; --h: 530px; --accent: #1a73e8; --fill: 0;
-            /* Light Theme */
             --body-bg: #eef1f4; --bg: #ffffff; --text-main: #1a1a1b; --text-muted: #5f6368;
             --text-header: #888; --border: #f1f3f4; --border-outer: #bbb; --hover: #f1f3f4;
             --input-bg: #f1f3f4; --shadow: rgba(0,0,0,0.15);
@@ -22,46 +20,37 @@
             --input-bg: #2d2d2d; --shadow: rgba(0,0,0,0.5);
         }
 
-        /* SHARP UI - Zero Rounding */
         * { box-sizing: border-box; margin: 0; padding: 0; border-radius: 0 !important; }
         
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             background: var(--body-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; 
-            color: var(--text-main); transition: background 0.2s ease;
+            color: var(--text-main); transition: background 0.3s ease;
         }
 
         .main-wrapper { display: flex; gap: 24px; align-items: flex-start; }
 
-        /* Picker Component */
         .picker {
             width: var(--w-picker); height: var(--h); background: var(--bg);
             box-shadow: 0 12px 40px var(--shadow); display: flex; flex-direction: column;
             overflow: hidden; border: 1px solid var(--border-outer); position: relative;
         }
 
-        /* Nav Bar */
         .nav { display: flex; padding: 4px 6px 0; border-bottom: 1px solid var(--border); justify-content: space-between; flex-shrink: 0; }
         .nav.bottom { order: 4; border-bottom: none; border-top: 1px solid var(--border); padding: 0 6px 4px; }
         .nav-btn { flex: 1; padding: 12px 0 14px; border: none; background: transparent; cursor: pointer; color: var(--text-muted); position: relative; display: flex; justify-content: center; }
         .nav-btn.active { color: var(--accent); }
-        .nav-btn.active::after { 
-            content: ''; position: absolute; bottom: 0; left: 10px; right: 10px; height: 3px; 
-            background: var(--accent); border-radius: 3px 3px 0 0 !important; /* Visual indicator rounded only on top */
-        }
-        .nav.bottom .nav-btn.active::after { bottom: auto; top: 0; border-radius: 0 0 3px 3px !important; }
+        .nav-btn.active::after { content: ''; position: absolute; bottom: 0; left: 10px; right: 10px; height: 3px; background: var(--accent); }
 
         .material-symbols-outlined { font-size: 22px; font-variation-settings: 'FILL' var(--fill), 'wght' 400, 'opsz' 20; transition: font-variation-settings 0.2s; }
         .active .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
 
-        /* Search Section */
         .search-area { padding: 12px 14px 6px; flex-shrink: 0; }
         .search-box { background: var(--input-bg); display: flex; align-items: center; padding: 0 12px; border: 1px solid transparent; }
         .search-box:focus-within { background: var(--bg); border-color: var(--accent); }
         .search-box .search-icon { color: var(--text-muted); font-size: 18px; margin-right: 10px; }
         #search { width: 100%; padding: 10px 0; border: none; background: transparent; font-size: 15px; outline: none; color: var(--text-main); }
 
-        /* Content Grid */
         .viewport { flex: 1; overflow-y: auto; padding: 0 14px 14px; scroll-behavior: smooth; }
         .viewport::-webkit-scrollbar { width: 5px; }
         .viewport::-webkit-scrollbar-thumb { background: var(--border-outer); }
@@ -71,14 +60,11 @@
         .emoji-btn:hover { background: var(--hover); }
         .emoji-btn img { width: 30px; height: 30px; object-fit: contain; }
 
-        /* Footer / Preview */
         .footer { height: 72px; padding: 0 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 14px; background: var(--bg); flex-shrink: 0; }
-        .footer.top { order: -1; border-top: none; border-bottom: 1px solid var(--border); }
         #preview-char { font-size: 36px; min-width: 44px; text-align: center; display: flex; align-items: center; justify-content: center; }
-        #preview-char img { width: 40px; height: 40px; }
+        #preview-char img { width: 38px; height: 38px; }
         #preview-name { font-size: 14px; color: var(--text-muted); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
         
-        /* Skin Tones Menu */
         .skin-trigger { width: 24px; height: 24px; border: 1px solid #666; cursor: pointer; background-size: cover; background-position: center; }
         .skin-menu { position: absolute; bottom: 72px; right: 0; background: var(--bg); box-shadow: 0 -4px 20px rgba(0,0,0,0.3); border: 1px solid var(--border-outer); display: none; flex-direction: column; width: 175px; padding: 2px; z-index: 100; }
         .skin-menu.active { display: flex; }
@@ -86,7 +72,6 @@
         .skin-opt:hover { background: var(--hover); }
         .skin-opt img { width: 18px; height: 18px; }
 
-        /* Settings Panel */
         .settings-panel { width: var(--w-settings); display: flex; flex-direction: column; gap: 10px; }
         .setting-row { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
         .setting-label { font-size: 16px; color: var(--text-main); font-weight: 500; }
@@ -104,18 +89,18 @@
 
 <div class="main-wrapper">
     <div class="picker" id="emoji-picker">
-        <div id="loader">Loading v17.0 Stable...</div>
+        <div id="loader">Loading...</div>
         <div class="nav" id="cat-nav">
-            <button class="nav-btn active" data-group="recent" title="Recent"><span class="material-symbols-outlined">schedule</span></button>
-            <button class="nav-btn" data-group="0" title="Smileys"><span class="material-symbols-outlined">sentiment_satisfied</span></button>
-            <button class="nav-btn" data-group="1" title="People"><span class="material-symbols-outlined">emoji_people</span></button>
-            <button class="nav-btn" data-group="3" title="Nature"><span class="material-symbols-outlined">emoji_nature</span></button>
-            <button class="nav-btn" data-group="4" title="Food"><span class="material-symbols-outlined">emoji_food_beverage</span></button>
-            <button class="nav-btn" data-group="6" title="Events"><span class="material-symbols-outlined">emoji_events</span></button>
-            <button class="nav-btn" data-group="5" title="Travel"><span class="material-symbols-outlined">emoji_transportation</span></button>
-            <button class="nav-btn" data-group="7" title="Objects"><span class="material-symbols-outlined">emoji_objects</span></button>
-            <button class="nav-btn" data-group="8" title="Symbols"><span class="material-symbols-outlined">emoji_symbols</span></button>
-            <button class="nav-btn" data-group="9" title="Flags"><span class="material-symbols-outlined">flag</span></button>
+            <button class="nav-btn active" data-group="recent"><span class="material-symbols-outlined">schedule</span></button>
+            <button class="nav-btn" data-group="0"><span class="material-symbols-outlined">sentiment_satisfied</span></button>
+            <button class="nav-btn" data-group="1"><span class="material-symbols-outlined">emoji_people</span></button>
+            <button class="nav-btn" data-group="3"><span class="material-symbols-outlined">emoji_nature</span></button>
+            <button class="nav-btn" data-group="4"><span class="material-symbols-outlined">emoji_food_beverage</span></button>
+            <button class="nav-btn" data-group="6"><span class="material-symbols-outlined">emoji_events</span></button>
+            <button class="nav-btn" data-group="5"><span class="material-symbols-outlined">emoji_transportation</span></button>
+            <button class="nav-btn" data-group="7"><span class="material-symbols-outlined">emoji_objects</span></button>
+            <button class="nav-btn" data-group="8"><span class="material-symbols-outlined">emoji_symbols</span></button>
+            <button class="nav-btn" data-group="9"><span class="material-symbols-outlined">flag</span></button>
         </div>
         <div class="search-area"><div class="search-box"><span class="material-symbols-outlined search-icon" style="font-variation-settings:'FILL' 0">search</span><input type="text" id="search" placeholder="Search..." autocomplete="off"></div></div>
         <div class="viewport" id="viewport">
@@ -142,26 +127,65 @@
         <div class="setting-row"><span class="setting-label" id="lbl-theme">Theme:</span><select id="theme-select"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
         <div class="setting-row"><span class="setting-label" id="lbl-icons">Icons:</span><select id="icon-style-select"><option value="auto">Auto</option><option value="1">Filled</option><option value="0">Outlined</option></select></div>
         <div class="setting-row"><span class="setting-label" id="lbl-version">Emoji version:</span><select><option>17.0 (Final)</option></select></div>
-        <div class="setting-row"><span class="setting-label" id="lbl-locale">Locale (UI):</span><select id="locale-select" class="bg-teal"><option value="en">English</option><option value="pl">Polski</option></select></div>
+        
+        <div class="setting-row">
+            <span class="setting-label" id="lbl-locale">Locale (UI):</span>
+            <select id="locale-select" class="bg-teal">
+                <option value="bn">Bangla (bn)</option>
+                <option value="zh">Chinese (zh)</option>
+                <option value="zh-hant">Chinese, Traditional (zh-hant)</option>
+                <option value="da">Danish (da)</option>
+                <option value="nl">Dutch (nl)</option>
+                <option value="en">English (en)</option>
+                <option value="en-gb">English, Great Britain (en-gb)</option>
+                <option value="et">Estonian (et)</option>
+                <option value="fi">Finnish (fi)</option>
+                <option value="fr">French (fr)</option>
+                <option value="de">German (de)</option>
+                <option value="hi">Hindi (hi)</option>
+                <option value="hu">Hungarian (hu)</option>
+                <option value="it">Italian (it)</option>
+                <option value="ja">Japanese (ja)</option>
+                <option value="ko">Korean (ko)</option>
+                <option value="lt">Lithuanian (lt)</option>
+                <option value="ms">Malay (ms)</option>
+                <option value="nb">Norwegian, Bokmål (nb)</option>
+                <option value="pl">Polish (pl)</option>
+                <option value="pt">Portuguese (pt)</option>
+                <option value="ru">Russian (ru)</option>
+                <option value="es">Spanish (es)</option>
+                <option value="es-mx">Spanish, Mexico (es-mx)</option>
+                <option value="sv">Swedish (sv)</option>
+                <option value="th">Thai (th)</option>
+                <option value="uk">Ukrainian (uk)</option>
+                <option value="vi">Vietnamese (vi)</option>
+            </select>
+        </div>
+
         <div class="setting-row"><span class="setting-label" id="lbl-nav">Nav position:</span><select id="nav-pos-select"><option value="top">Top</option><option value="bottom">Bottom</option></select></div>
         <div class="setting-row"><span class="setting-label" id="lbl-prev">Preview position:</span><select id="prev-pos-select"><option value="bottom">Bottom</option><option value="top">Top</option></select></div>
-        <button class="broom-btn" id="clear-history" title="Clear History"><img src="https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/72x72/1F9F9.png" alt="Clear"></button>
+        <button class="broom-btn" id="clear-history"><img src="https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/72x72/1F9F9.png"></button>
         <div class="attribution">Created by AI Agent</div>
     </div>
 </div>
 
 <script>
-    const I18N = {
-        en: { search: "Search emojis...", recent: "Frequently used", placeholder: "Select an emoji", set: "Set:", theme: "Theme:", icons: "Icons:", version: "Emoji version:", locale: "Locale (UI):", nav: "Nav position:", prev: "Preview position:", tones: ["Default","Light","Medium-Light","Medium","Medium-Dark","Dark"] },
-        pl: { search: "Szukaj emoji...", recent: "Często używane", placeholder: "Wybierz emoji", set: "Zestaw:", theme: "Motyw:", icons: "Ikony:", version: "Wersja emoji:", locale: "Język (UI):", nav: "Pozycja nawigacji:", prev: "Pozycja podglądu:", tones: ["Domyślny","Jasny","Średnio-jasny","Średni","Średnio-ciemny","Ciemny"] }
+    // i18n Logic - Simplified mapping to trigger Emojibase fetch and update labels
+    const I18N_MAP = {
+        en: { search: "Search emojis...", recent: "Frequently used", placeholder: "Select an emoji", set: "Set:", theme: "Theme:", icons: "Icons:", version: "Emoji version:", locale: "Locale (UI):", nav: "Nav position:", prev: "Preview position:" },
+        pl: { search: "Szukaj emoji...", recent: "Często używane", placeholder: "Wybierz emoji", set: "Zestaw:", theme: "Motyw:", icons: "Ikony:", version: "Wersja emoji:", locale: "Język (UI):", nav: "Pozycja nawigacji:", prev: "Pozycja podglądu:" },
+        fr: { search: "Rechercher...", recent: "Fréquemment utilisé", placeholder: "Choisissez un emoji", set: "Jeu:", theme: "Thème:", icons: "Icônes:", version: "Version:", locale: "Langue:", nav: "Position nav:", prev: "Position aperçu:" },
+        de: { search: "Suchen...", recent: "Häufig verwendet", placeholder: "Emoji auswählen", set: "Set:", theme: "Thema:", icons: "Icons:", version: "Version:", locale: "Sprache:", nav: "Nav position:", prev: "Vorschau position:" },
+        es: { search: "Buscar...", recent: "Frecuentes", placeholder: "Selecciona un emoji", set: "Conjunto:", theme: "Tema:", icons: "Iconos:", version: "Versión:", locale: "Idioma:", nav: "Posición nav:", prev: "Posición vista:" }
+        // Fallback to English for other specific labels, but Emojibase will provide emoji names
     };
 
     const SKIN_NATIVE = ['default','light','mediumlight','medium','mediumdark','dark'].map(n => `/skintone/${n}.png`);
     const SKIN_OPENMOJI = ['openmoji_default.svg','openmoji_light.svg','openmoji_mediumlight.svg','openmoji_medium.svg','openmoji_mediumdark.svg','openmoji_dark.svg'].map(n => `/skintone/${n}`);
     const SKIN_GOOGLE = ['google_default.png','google_light.png','google_mediumlight.png','google_medium.png','google_mediumdark.png','google_dark.png'].map(n => `/skintone/${n}`);
 
-    let ALL_DATA = [], GROUPS = {}, RECENT = JSON.parse(localStorage.getItem('fav_v12_final') || '[]');
-    let SKIN = parseInt(localStorage.getItem('user_skin_v12') || '0'), SET = localStorage.getItem('user_set_v12') || 'native', THEME = localStorage.getItem('user_theme_v12') || 'auto', ICONS = localStorage.getItem('user_icons_v12') || 'auto', LOCALE = localStorage.getItem('user_lang_v12') || 'en';
+    let ALL_DATA = [], GROUPS = {}, RECENT = JSON.parse(localStorage.getItem('fav_v13_final') || '[]');
+    let SKIN = parseInt(localStorage.getItem('user_skin_v13') || '0'), SET = localStorage.getItem('user_set_v13') || 'native', THEME = localStorage.getItem('user_theme_v13') || 'auto', ICONS = localStorage.getItem('user_icons_v13') || 'auto', LOCALE = localStorage.getItem('user_lang_v13') || 'en';
 
     async function fetchData() {
         document.getElementById('loader').style.display = 'flex';
@@ -178,12 +202,14 @@
     }
 
     function updateUIStrings() {
-        const t = I18N[LOCALE];
+        const t = I18N_MAP[LOCALE] || I18N_MAP['en'];
         document.getElementById('search').placeholder = t.search;
         document.getElementById('title-recent').textContent = t.recent;
         document.getElementById('preview-name').textContent = t.placeholder;
-        ['set','theme','icons','version','locale','nav','prev'].forEach(k => document.getElementById(`lbl-${k}`).textContent = t[k]);
-        document.querySelectorAll('.skin-opt span').forEach((s, i) => s.textContent = t.tones[i]);
+        ['set','theme','icons','version','locale','nav','prev'].forEach(k => {
+            const el = document.getElementById(`lbl-${k}`);
+            if(el) el.textContent = t[k] || I18N_MAP['en'][k];
+        });
     }
 
     function updateThemeAndIcons() {
@@ -207,7 +233,6 @@
         const data = getEmojiData(obj);
         const b = document.createElement('button');
         b.className = 'emoji-btn';
-        b.title = data.label;
         const gHex = data.hex.toLowerCase().replace(/-/g, '_');
         const imgUrl = (SET === 'google') ? `https://raw.githubusercontent.com/googlefonts/noto-emoji/refs/heads/main/png/72/emoji_u${gHex}.png` : `https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/72x72/${data.hex.toUpperCase()}.png`;
         
@@ -222,7 +247,7 @@
         b.onclick = () => {
             navigator.clipboard.writeText(data.char);
             RECENT = [obj, ...RECENT.filter(r => r.hexcode !== obj.hexcode)].slice(0, 16);
-            localStorage.setItem('fav_v12_final', JSON.stringify(RECENT));
+            localStorage.setItem('fav_v13_final', JSON.stringify(RECENT));
             const oldName = data.label;
             document.getElementById('preview-name').textContent = "Copied!";
             setTimeout(() => document.getElementById('preview-name').textContent = oldName, 800);
@@ -257,14 +282,14 @@
         });
     }
 
-    // Controls
-    document.getElementById('locale-select').onchange = (e) => { LOCALE = e.target.value; localStorage.setItem('user_lang_v12', LOCALE); fetchData(); };
-    document.getElementById('theme-select').onchange = (e) => { THEME = e.target.value; localStorage.setItem('user_theme_v12', THEME); updateThemeAndIcons(); };
-    document.getElementById('icon-style-select').onchange = (e) => { ICONS = e.target.value; localStorage.setItem('user_icons_v12', ICONS); updateThemeAndIcons(); };
-    document.getElementById('set-select').onchange = (e) => { SET = e.target.value; localStorage.setItem('user_set_v12', SET); updateSkinUI(); render(); };
+    // Logic for Settings
+    document.getElementById('locale-select').onchange = (e) => { LOCALE = e.target.value; localStorage.setItem('user_lang_v13', LOCALE); fetchData(); };
+    document.getElementById('theme-select').onchange = (e) => { THEME = e.target.value; localStorage.setItem('user_theme_v13', THEME); updateThemeAndIcons(); };
+    document.getElementById('icon-style-select').onchange = (e) => { ICONS = e.target.value; localStorage.setItem('user_icons_v13', ICONS); updateThemeAndIcons(); };
+    document.getElementById('set-select').onchange = (e) => { SET = e.target.value; localStorage.setItem('user_set_v13', SET); updateSkinUI(); render(); };
     document.getElementById('nav-pos-select').onchange = (e) => { document.getElementById('cat-nav').classList.toggle('bottom', e.target.value === 'bottom'); };
     document.getElementById('prev-pos-select').onchange = (e) => { document.getElementById('picker-footer').classList.toggle('top', e.target.value === 'top'); };
-    document.getElementById('clear-history').onclick = () => { RECENT = []; localStorage.removeItem('fav_v12_final'); render(); };
+    document.getElementById('clear-history').onclick = () => { RECENT = []; localStorage.removeItem('fav_v13_final'); render(); };
     document.getElementById('search').oninput = render;
     document.getElementById('cat-nav').onclick = e => {
         const b = e.target.closest('.nav-btn'); if (!b) return;
@@ -272,11 +297,11 @@
         if (target) document.getElementById('viewport').scrollTo({ top: target.offsetTop, behavior: 'smooth' });
     };
     document.getElementById('skin-trigger').onclick = (e) => { e.stopPropagation(); document.getElementById('skin-menu').classList.toggle('active'); };
-    document.querySelectorAll('.skin-opt').forEach(opt => opt.onclick = () => { SKIN = parseInt(opt.dataset.idx); localStorage.setItem('user_skin_v12', SKIN); updateSkinUI(); render(); });
+    document.querySelectorAll('.skin-opt').forEach(opt => opt.onclick = () => { SKIN = parseInt(opt.dataset.idx); localStorage.setItem('user_skin_v13', SKIN); updateSkinUI(); render(); });
     window.onclick = () => document.getElementById('skin-menu').classList.remove('active');
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if(THEME==='auto') updateThemeAndIcons(); });
 
-    // Startup
+    // Bootstrap
     document.getElementById('locale-select').value = LOCALE;
     document.getElementById('theme-select').value = THEME;
     document.getElementById('icon-style-select').value = ICONS;
