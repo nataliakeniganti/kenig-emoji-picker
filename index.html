@@ -8,9 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
     <style>
         :root {
-            /* Layout Constants */
             --w-picker: 360px; --w-settings: 260px; --h: 540px; --accent: #1a73e8; --fill: 0;
-            /* Light Theme */
             --body-bg: #eef1f4; --bg: #ffffff; --text-main: #1a1a1b; --text-muted: #5f6368;
             --text-header: #888; --border: #f1f3f4; --border-outer: #bbb; --hover: #f1f3f4;
             --input-bg: #f1f3f4; --shadow: rgba(0,0,0,0.15);
@@ -22,7 +20,7 @@
             --input-bg: #2d2d2d; --shadow: rgba(0,0,0,0.5);
         }
 
-        /* Sharp UI - Forced Unrounded Edges */
+        /* Sharp UI - Global Reset */
         * { box-sizing: border-box; margin: 0; padding: 0; border-radius: 0 !important; }
         
         body { 
@@ -41,9 +39,11 @@
         }
 
         /* Nav Bar */
-        .nav { display: flex; padding: 4px 6px 0; border-bottom: 1px solid var(--border); justify-content: space-between; flex-shrink: 0; }
+        .nav { display: flex; padding: 4px 6px 0; border-bottom: 1px solid var(--border); justify-content: space-between; flex-shrink: 0; overflow-x: auto; scrollbar-width: none; }
+        .nav::-webkit-scrollbar { display: none; }
         .nav.bottom { order: 4; border-bottom: none; border-top: 1px solid var(--border); padding: 0 6px 4px; }
-        .nav-btn { flex: 1; padding: 12px 0 14px; border: none; background: transparent; cursor: pointer; color: var(--text-muted); position: relative; display: flex; justify-content: center; }
+        
+        .nav-btn { flex: 1; padding: 12px 8px 14px; border: none; background: transparent; cursor: pointer; color: var(--text-muted); position: relative; display: flex; justify-content: center; }
         .nav-btn.active { color: var(--accent); }
         .nav-btn.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--accent); }
 
@@ -99,21 +99,21 @@
 
 <div class="main-wrapper">
     <div class="picker" id="emoji-picker">
-        <div id="loader">Loading Emojis & Extras...</div>
+        <div id="loader">Fetching 2,500+ Emojis...</div>
         <div class="nav" id="cat-nav">
-            <button class="nav-btn active" data-group="recent" title="Recent"><span class="material-symbols-outlined">schedule</span></button>
-            <button class="nav-btn" data-group="0" title="Smileys"><span class="material-symbols-outlined">sentiment_satisfied</span></button>
-            <button class="nav-btn" data-group="1" title="People"><span class="material-symbols-outlined">emoji_people</span></button>
-            <button class="nav-btn" data-group="3" title="Nature"><span class="material-symbols-outlined">emoji_nature</span></button>
-            <button class="nav-btn" data-group="4" title="Food"><span class="material-symbols-outlined">emoji_food_beverage</span></button>
-            <button class="nav-btn" data-group="6" title="Events"><span class="material-symbols-outlined">emoji_events</span></button>
-            <button class="nav-btn" data-group="5" title="Travel"><span class="material-symbols-outlined">emoji_transportation</span></button>
-            <button class="nav-btn" data-group="7" title="Objects"><span class="material-symbols-outlined">emoji_objects</span></button>
-            <button class="nav-btn" data-group="8" title="Symbols"><span class="material-symbols-outlined">emoji_symbols</span></button>
-            <button class="nav-btn" data-group="9" title="Flags"><span class="material-symbols-outlined">flag</span></button>
-            <button class="nav-btn" data-group="99" title="Extras"><span class="material-symbols-outlined">extension</span></button>
+            <button class="nav-btn active" data-group="recent"><span class="material-symbols-outlined">schedule</span></button>
+            <button class="nav-btn" data-group="0"><span class="material-symbols-outlined">sentiment_satisfied</span></button>
+            <button class="nav-btn" data-group="1"><span class="material-symbols-outlined">emoji_people</span></button>
+            <button class="nav-btn" data-group="3"><span class="material-symbols-outlined">emoji_nature</span></button>
+            <button class="nav-btn" data-group="4"><span class="material-symbols-outlined">emoji_food_beverage</span></button>
+            <button class="nav-btn" data-group="6"><span class="material-symbols-outlined">emoji_events</span></button>
+            <button class="nav-btn" data-group="5"><span class="material-symbols-outlined">emoji_transportation</span></button>
+            <button class="nav-btn" data-group="7"><span class="material-symbols-outlined">emoji_objects</span></button>
+            <button class="nav-btn" data-group="8"><span class="material-symbols-outlined">emoji_symbols</span></button>
+            <button class="nav-btn" data-group="9"><span class="material-symbols-outlined">flag</span></button>
+            <button class="nav-btn" data-group="99"><span class="material-symbols-outlined">extension</span></button>
         </div>
-        <div class="search-area"><div class="search-box"><span class="material-symbols-outlined search-icon">search</span><input type="text" id="search" placeholder="Search..." autocomplete="off"></div></div>
+        <div class="search-area"><div class="search-box"><span class="material-symbols-outlined search-icon" style="font-variation-settings:'FILL' 0">search</span><input type="text" id="search" placeholder="Search..." autocomplete="off"></div></div>
         <div class="viewport" id="viewport">
             <div id="section-recent"><div class="section-title" id="title-recent">Frequently used</div><div class="emoji-grid" id="grid-recent"></div></div>
             <div id="main-groups"></div>
@@ -157,33 +157,32 @@
     const SKIN_OPENMOJI = ['default','light','mediumlight','medium','mediumdark','dark'].map(n => `/skintone/openmoji_${n}.svg`);
     const SKIN_GOOGLE = ['default','light','mediumlight','medium','mediumdark','dark'].map(n => `/skintone/google_${n}.png`);
 
-    let ALL_DATA = [], GROUPS = {}, RECENT = JSON.parse(localStorage.getItem('kenig_fav_final_ext') || '[]');
-    let SKIN = parseInt(localStorage.getItem('kenig_skin') || '0'), SET = localStorage.getItem('kenig_set') || 'native';
-    let THEME = localStorage.getItem('kenig_theme') || 'auto', ICONS = localStorage.getItem('kenig_icons') || 'auto', LOCALE = localStorage.getItem('kenig_lang') || 'en';
+    let ALL_DATA = [], GROUPS = {}, RECENT = JSON.parse(localStorage.getItem('kenig_fav_v10') || '[]');
+    let SKIN = parseInt(localStorage.getItem('kenig_skin_v10') || '0'), SET = localStorage.getItem('kenig_set_v10') || 'native';
+    let THEME = localStorage.getItem('kenig_theme_v10') || 'auto', ICONS = localStorage.getItem('kenig_icons_v10') || 'auto', LOCALE = localStorage.getItem('kenig_lang_v10') || 'en';
 
     async function fetchData() {
         document.getElementById('loader').style.display = 'flex';
-        const EXTRAS_OM_URL = 'https://raw.githubusercontent.com/nataliakeniganti/kenig-emoji-picker/refs/heads/main/data/extras-openmoji.json';
-        const EXTRAS_UNI_URL = 'https://raw.githubusercontent.com/nataliakeniganti/kenig-emoji-picker/refs/heads/main/data/extras-unicode.json';
+        const EXTRAS_OM = 'https://raw.githubusercontent.com/nataliakeniganti/kenig-emoji-picker/refs/heads/main/data/extras-openmoji.json';
+        const EXTRAS_UNI = 'https://raw.githubusercontent.com/nataliakeniganti/kenig-emoji-picker/refs/heads/main/data/extras-unicode.json';
 
         try {
-            const [d, m, ex_om, ex_uni] = await Promise.all([
+            const [eb, msg, ex_om, ex_uni] = await Promise.all([
                 fetch(`https://cdn.jsdelivr.net/npm/emojibase-data@latest/${LOCALE}/data.json`).then(r=>r.json()),
                 fetch(`https://cdn.jsdelivr.net/npm/emojibase-data@latest/${LOCALE}/messages.json`).then(r=>r.json()),
-                fetch(EXTRAS_OM_URL).then(r=>r.json()),
-                fetch(EXTRAS_UNI_URL).then(r=>r.json())
+                fetch(EXTRAS_OM).then(r=>r.json()),
+                fetch(EXTRAS_UNI).then(r=>r.json())
             ]);
 
-            ALL_DATA = d; 
-            m.groups.forEach(g => GROUPS[g.order] = g.message);
+            ALL_DATA = eb;
+            msg.groups.forEach(g => GROUPS[g.order] = g.message);
             
-            // Integrate Extras
             GROUPS[99] = I18N[LOCALE].extras;
             const extras = [...ex_om, ...ex_uni].map(x => ({...x, group: 99, isExtra: true}));
             ALL_DATA.push(...extras);
 
             document.getElementById('loader').style.display = 'none';
-            updateSkinUI(); updateUIStrings(); render();
+            updateThemeAndIcons(); updateSkinUI(); updateUIStrings(); render();
         } catch(e) { document.getElementById('loader').textContent = "Connection Error"; }
     }
 
@@ -227,7 +226,7 @@
             const img = document.createElement('img');
             img.loading = "lazy";
             img.src = (SET === 'google' && !data.isExtra) ? goUrl : omUrl;
-            img.onerror = () => b.textContent = data.char;
+            img.onerror = () => b.textContent = data.char || '?';
             b.appendChild(img);
         }
 
@@ -240,7 +239,7 @@
         b.onclick = () => {
             navigator.clipboard.writeText(data.char);
             RECENT = [obj, ...RECENT.filter(r => r.hexcode !== obj.hexcode)].slice(0, 16);
-            localStorage.setItem('kenig_fav_final_ext', JSON.stringify(RECENT));
+            localStorage.setItem('kenig_fav_v10', JSON.stringify(RECENT));
             if(!document.getElementById('search').value) render();
         };
         return b;
@@ -272,14 +271,14 @@
         });
     }
 
-    // Event Handlers
-    document.getElementById('locale-select').onchange = (e) => { LOCALE = e.target.value; localStorage.setItem('kenig_lang', LOCALE); fetchData(); };
-    document.getElementById('theme-select').onchange = (e) => { THEME = e.target.value; localStorage.setItem('kenig_theme', THEME); updateThemeAndIcons(); };
-    document.getElementById('icon-style-select').onchange = (e) => { ICONS = e.target.value; localStorage.setItem('kenig_icons', ICONS); updateThemeAndIcons(); };
-    document.getElementById('set-select').onchange = (e) => { SET = e.target.value; localStorage.setItem('kenig_set', SET); updateSkinUI(); render(); };
+    // Handlers
+    document.getElementById('locale-select').onchange = (e) => { LOCALE = e.target.value; localStorage.setItem('kenig_lang_v10', LOCALE); fetchData(); };
+    document.getElementById('theme-select').onchange = (e) => { THEME = e.target.value; localStorage.setItem('kenig_theme_v10', THEME); updateThemeAndIcons(); };
+    document.getElementById('icon-style-select').onchange = (e) => { ICONS = e.target.value; localStorage.setItem('kenig_icons_v10', ICONS); updateThemeAndIcons(); };
+    document.getElementById('set-select').onchange = (e) => { SET = e.target.value; localStorage.setItem('kenig_set_v10', SET); updateSkinUI(); render(); };
     document.getElementById('nav-pos-select').onchange = (e) => { document.getElementById('cat-nav').classList.toggle('bottom', e.target.value === 'bottom'); };
     document.getElementById('prev-pos-select').onchange = (e) => { document.getElementById('picker-footer').classList.toggle('top', e.target.value === 'top'); };
-    document.getElementById('clear-history').onclick = () => { RECENT = []; localStorage.removeItem('kenig_fav_final_ext'); render(); };
+    document.getElementById('clear-history').onclick = () => { RECENT = []; localStorage.removeItem('kenig_fav_v10'); render(); };
     document.getElementById('search').oninput = render;
     document.getElementById('cat-nav').onclick = e => {
         const b = e.target.closest('.nav-btn'); if (!b) return;
@@ -287,7 +286,7 @@
         if (target) document.getElementById('viewport').scrollTo({ top: target.offsetTop, behavior: 'smooth' });
     };
     document.getElementById('skin-trigger').onclick = (e) => { e.stopPropagation(); document.getElementById('skin-menu').classList.toggle('active'); };
-    document.querySelectorAll('.skin-opt').forEach(opt => opt.onclick = () => { SKIN = parseInt(opt.dataset.idx); localStorage.setItem('kenig_skin', SKIN); updateSkinUI(); render(); });
+    document.querySelectorAll('.skin-opt').forEach(opt => opt.onclick = () => { SKIN = parseInt(opt.dataset.idx); localStorage.setItem('kenig_skin_v10', SKIN); updateSkinUI(); render(); });
     window.onclick = () => document.getElementById('skin-menu').classList.remove('active');
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateThemeAndIcons);
 
