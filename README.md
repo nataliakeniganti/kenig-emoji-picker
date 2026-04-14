@@ -2,7 +2,7 @@
 
 Note: Created by AI agent. A high-performance, professional-grade emoji picker featuring **1,949+ emojis**, multi-set support (Google, OpenMoji, Native), and a robust settings panel. Built with zero local dependencies and a strict "Sharp UI" aesthetic.
 
-<img width="45%" height="45%" alt="light theme" src="https://raw.githubusercontent.com/nataliakeniganti/kenig-emoji-picker/refs/heads/main/images/screenshot_light.png" /> <img width="45%" height="45%" alt="dark theme" src="https://raw.githubusercontent.com/nataliakeniganti/kenig-emoji-picker/refs/heads/main/images/screenshot_dark.png" />
+<img width="45%" height="45%" alt="light theme" src="images/screenshot_light.png" /> <img width="45%" height="45%" alt="dark theme" src="images/screenshot_dark.png" />
 
 ## 🚀 Features
 
