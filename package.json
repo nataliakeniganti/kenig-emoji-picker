@@ -1,0 +1,29 @@
+{
+  "name": "kenig-emoji-picker",
+  "private": true,
+  "version": "1.0",
+  "description": "A high-performance emoji picker supporting Native, Google, OpenMoji, and Twemoji sets.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "download-src": "curl https://raw.githubusercontent.com/nataliakeniganti/kenig-emoji-picker/refs/heads/main/index.html -o index.html"
+  },
+  "keywords": [
+    "emoji",
+    "picker",
+    "emojibase",
+    "twemoji",
+    "openmoji",
+    "frontend"
+  ],
+  "author": "Natalia Kenig",
+  "license": "MIT",
+  "dependencies": {
+    "emojibase-data": "^17.0.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.1"
+  }
+}
