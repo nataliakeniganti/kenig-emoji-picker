@@ -26,7 +26,7 @@
             --input-bg: #2d2d2d; --shadow: rgba(0,0,0,0.5);
         }
 
-        /* SHARP UI Reset - Force Zero Rounding */
+        /* SHARP UI Reset */
         * { box-sizing: border-box; margin: 0; padding: 0; border-radius: 0 !important; }
         
         body { 
@@ -37,51 +37,45 @@
 
         .main-wrapper { display: flex; gap: 24px; align-items: flex-start; }
 
-        /* Picker Component */
         .picker {
             width: var(--w-picker); height: var(--h); background: var(--bg);
             box-shadow: 0 12px 40px var(--shadow); display: flex; flex-direction: column;
             overflow: hidden; border: 1px solid var(--border-outer); position: relative;
         }
 
-        /* Navigation */
-        .nav { display: flex; padding: 4px 6px 0; border-bottom: 1px solid var(--border); justify-content: space-between; flex-shrink: 0; }
-        .nav-btn { flex: 1; padding: 12px 0 14px; border: none; background: transparent; cursor: pointer; color: var(--text-muted); position: relative; display: flex; justify-content: center; }
+        .nav { display: flex; padding: 4px 6px 0; border-bottom: 1px solid var(--border); justify-content: space-between; flex-shrink: 0; overflow-x: auto; scrollbar-width: none; }
+        .nav::-webkit-scrollbar { display: none; }
+        .nav-btn { flex: 1; padding: 12px 0 14px; border: none; background: transparent; cursor: pointer; color: var(--text-muted); position: relative; display: flex; justify-content: center; min-width: 35px; }
         .nav-btn.active { color: var(--accent); }
         .nav-btn.active::after { content: ''; position: absolute; bottom: 0; left: 10px; right: 10px; height: 3px; background: var(--accent); }
 
-        .material-symbols-outlined { font-size: 22px; font-variation-settings: 'FILL' var(--fill), 'wght' 400, 'opsz' 20; }
+        .material-symbols-outlined { font-size: 22px; font-variation-settings: 'FILL' var(--fill), 'wght' 400, 'opsz' 20; transition: font-variation-settings 0.2s; }
         .active .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
 
-        /* Search Section */
         .search-area { padding: 12px 14px 6px; flex-shrink: 0; }
         .search-box { background: var(--input-bg); display: flex; align-items: center; padding: 0 12px; border: 1px solid transparent; }
         .search-box:focus-within { background: var(--bg); border-color: var(--accent); }
         .search-box .search-icon { color: var(--text-muted); font-size: 18px; margin-right: 10px; }
         #search { width: 100%; padding: 10px 0; border: none; background: transparent; font-size: 15px; outline: none; color: var(--text-main); }
 
-        /* Content Grid */
         .viewport { flex: 1; overflow-y: auto; padding: 0 14px 14px; scroll-behavior: smooth; }
         .viewport::-webkit-scrollbar { width: 5px; }
         .viewport::-webkit-scrollbar-thumb { background: var(--border-outer); }
-        .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-header); padding: 20px 4px 10px; background: var(--bg); position: sticky; top: 0; z-index: 10; }
+        .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-header); padding: 18px 4px 10px; background: var(--bg); position: sticky; top: 0; z-index: 10; }
         .emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 1px; }
         .emoji-btn { width: 40px; height: 40px; font-size: 26px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .emoji-btn:hover { background: var(--hover); }
         .emoji-btn img { width: 30px; height: 30px; object-fit: contain; }
 
-        /* Font Classes for Google Non-Images */
         .f-google-color { font-family: 'Noto Color Emoji', sans-serif !important; }
         .f-google-black { font-family: 'Noto Emoji', sans-serif !important; font-weight: 600; }
         .mode-black { filter: grayscale(1) contrast(1.1); }
 
-        /* Footer / Preview */
         .footer { height: 72px; padding: 0 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 14px; background: var(--bg); flex-shrink: 0; }
         #preview-char { font-size: 36px; min-width: 44px; text-align: center; display: flex; align-items: center; justify-content: center; }
         #preview-char img { width: 38px; height: 38px; }
         #preview-name { font-size: 14px; color: var(--text-muted); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
         
-        /* Skin Tones Trigger */
         .skin-trigger { width: 24px; height: 24px; border: 1px solid #666; cursor: pointer; background-size: cover; background-position: center; }
         .skin-menu { position: absolute; bottom: 72px; right: 0; background: var(--bg); box-shadow: 0 -4px 20px rgba(0,0,0,0.3); border: 1px solid var(--border-outer); display: none; flex-direction: column; width: 175px; padding: 2px; z-index: 100; }
         .skin-menu.active { display: flex; }
@@ -89,12 +83,11 @@
         .skin-opt:hover { background: var(--hover); }
         .skin-opt img { width: 18px; height: 18px; }
 
-        /* Settings Panel */
         .settings-panel { width: var(--w-settings); display: flex; flex-direction: column; gap: 10px; }
         .setting-row { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
         .setting-label { font-size: 16px; color: var(--text-main); font-weight: 500; }
         select { width: 140px; padding: 6px 10px; font-size: 15px; border: 1px solid var(--border-outer); background: var(--bg); color: var(--text-main); appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%234285f4%22%20d%3D%22M7%2010l5%205%205-5z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 8px center; outline: none; }
-        .bg-teal { background-color: rgba(0,150,136,0.15) !important; }
+        .bg-teal { background-color: rgba(0, 150, 136, 0.1) !important; }
 
         .broom-btn { margin-top: 10px; width: 100%; padding: 15px; background: var(--bg); border: 1px solid var(--border-outer); display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .broom-btn:hover { background: var(--hover); }
@@ -106,9 +99,8 @@
 <body>
 
 <div class="main-wrapper">
-    <!-- Picker -->
     <div class="picker" id="emoji-picker">
-        <div id="loader">Loading Emojibase...</div>
+        <div id="loader">Loading v17.0 Stable...</div>
         <div class="nav" id="cat-nav">
             <button class="nav-btn active" data-group="recent" title="Recent"><span class="material-symbols-outlined">schedule</span></button>
             <button class="nav-btn" data-group="0" title="Smileys"><span class="material-symbols-outlined">sentiment_satisfied</span></button>
@@ -121,7 +113,7 @@
             <button class="nav-btn" data-group="8" title="Symbols"><span class="material-symbols-outlined">emoji_symbols</span></button>
             <button class="nav-btn" data-group="9" title="Flags"><span class="material-symbols-outlined">flag</span></button>
         </div>
-        <div class="search-area"><div class="search-box"><span class="material-symbols-outlined search-icon" style="font-variation-settings:'FILL' 0">search</span><input type="text" id="search" placeholder="Search..." autocomplete="off"></div></div>
+        <div class="search-area"><div class="search-box"><span class="material-symbols-outlined search-icon" style="font-variation-settings:'FILL' 0">search</span><input type="text" id="search" placeholder="Search emojis..." autocomplete="off"></div></div>
         <div class="viewport" id="viewport">
             <div id="section-recent"><div class="section-title" id="title-recent">Frequently used</div><div class="emoji-grid" id="grid-recent"></div></div>
             <div id="main-groups"></div>
@@ -141,9 +133,8 @@
         </div>
     </div>
 
-    <!-- Settings -->
     <div class="settings-panel">
-        <div class="setting-row"><span class="setting-label" id="lbl-set">Set:</span><select id="set-select"><option value="native">Native</option><option value="openmoji">OpenMoji</option><option value="google">Google</option></select></div>
+        <div class="setting-row"><span class="setting-label" id="lbl-set">Set:</span><select id="set-select"><option value="native">Native</option><option value="openmoji">OpenMoji</option><option value="google">Google</option><option value="twemoji">Twemoji</option></select></div>
         <div class="setting-row"><span class="setting-label" id="lbl-color">Color:</span><select id="color-select"><option value="color">Color</option><option value="black">Black</option></select></div>
         <div class="setting-row"><span class="setting-label" id="lbl-theme">Theme:</span><select id="theme-select"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
         <div class="setting-row"><span class="setting-label" id="lbl-icons">Icons:</span><select id="icon-style-select"><option value="auto">Auto</option><option value="1">Filled</option><option value="0">Outlined</option></select></div>
@@ -151,20 +142,9 @@
         <div class="setting-row">
             <span class="setting-label" id="lbl-locale">Locale (UI):</span>
             <select id="locale-select" class="bg-teal">
-                <option value="en">English (en)</option>
-                <option value="pl">Polski (pl)</option>
-                <option value="fr">French (fr)</option>
-                <option value="de">German (de)</option>
-                <option value="it">Italian (it)</option>
-                <option value="es">Spanish (es)</option>
-                <option value="ja">Japanese (ja)</option>
-                <option value="ko">Korean (ko)</option>
-                <option value="zh">Chinese (zh)</option>
+                <option value="en">English (en)</option><option value="pl">Polski (pl)</option><option value="fr">French (fr)</option><option value="de">German (de)</option><option value="it">Italian (it)</option><option value="es">Spanish (es)</option><option value="ja">Japanese (ja)</option><option value="ko">Korean (ko)</option><option value="zh">Chinese (zh)</option>
             </select>
         </div>
-        <div class="setting-row"><span class="setting-label" id="lbl-nav">Nav position:</span><select id="nav-pos-select"><option value="top">Top</option><option value="bottom">Bottom</option></select></div>
-        <div class="setting-row"><span class="setting-label" id="lbl-prev">Preview position:</span><select id="prev-pos-select"><option value="bottom">Bottom</option><option value="top">Top</option></select></div>
-
         <button class="broom-btn" id="clear-history" title="Clear History"><img src="https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/color/72x72/1F9F9.png" alt="Clear"></button>
         <div class="attribution">Created by AI Agent</div>
     </div>
@@ -172,18 +152,20 @@
 
 <script>
     const I18N_MAP = {
-        en: { search: "Search emojis...", recent: "Frequently used", placeholder: "Select an emoji", set: "Set:", color: "Color:", theme: "Theme:", icons: "Icons:", version: "Emoji version:", locale: "Locale (UI):", nav: "Nav position:", prev: "Preview position:", tones: ["Default","Light","Medium-Light","Medium","Medium-Dark","Dark"] },
-        pl: { search: "Szukaj emoji...", recent: "Często używane", placeholder: "Wybierz emoji", set: "Zestaw:", color: "Kolor:", theme: "Motyw:", icons: "Ikony:", version: "Wersja emoji:", locale: "Język (UI):", nav: "Pozycja nawigacji:", prev: "Pozycja podglądu:", tones: ["Domyślny","Jasny","Średnio-jasny","Średni","Średnio-ciemny","Ciemny"] }
+        en: { search: "Search emojis...", recent: "Frequently used", placeholder: "Select an emoji", set: "Set:", color: "Color:", theme: "Theme:", icons: "Icons:", version: "Emoji version:", locale: "Locale (UI):", tones: ["Default","Light","Medium-Light","Medium","Medium-Dark","Dark"] },
+        pl: { search: "Szukaj emoji...", recent: "Często używane", placeholder: "Wybierz emoji", set: "Zestaw:", color: "Kolor:", theme: "Motyw:", icons: "Ikony:", version: "Wersja emoji:", locale: "Język (UI):", tones: ["Domyślny","Jasny","Średnio-jasny","Średni","Średnio-ciemny","Ciemny"] }
     };
 
-    // UI Skin Thumbnails use images for clarity
-    const SKIN_NATIVE = ['default','light','mediumlight','medium','mediumdark','dark'].map(n => `/skintone/${n}.png`);
-    const SKIN_OPENMOJI = ['openmoji_default.svg','openmoji_light.svg','openmoji_mediumlight.svg','openmoji_medium.svg','openmoji_mediumdark.svg','openmoji_dark.svg'].map(n => `/skintone/${n}`);
-    const SKIN_GOOGLE = ['google_default.png','google_light.png','google_mediumlight.png','google_medium.png','google_mediumdark.png','google_dark.png'].map(n => `/skintone/${n}`);
+    const SKIN_PATHS = {
+        native: ['default','light','mediumlight','medium','mediumdark','dark'].map(n => `/skintone/${n}.png`),
+        openmoji: ['default','light','mediumlight','medium','mediumdark','dark'].map(n => `/skintone/openmoji_${n}.svg`),
+        google: ['default','light','mediumlight','medium','mediumdark','dark'].map(n => `/skintone/google_${n}.png`),
+        twemoji: ['default','light','mediumlight','medium','mediumdark','dark'].map(n => `/skintone/${n}.png`) // Fallback to native thumb style
+    };
 
-    let ALL_DATA = [], GROUPS = {}, RECENT = JSON.parse(localStorage.getItem('fav_final_v16') || '[]');
-    let SKIN = parseInt(localStorage.getItem('user_skin_v16') || '0'), SET = localStorage.getItem('user_set_v16') || 'native';
-    let THEME = localStorage.getItem('user_theme_v16') || 'auto', ICONS = localStorage.getItem('user_icons_v16') || 'auto', LOCALE = localStorage.getItem('user_lang_v16') || 'en', COLOR_MODE = localStorage.getItem('user_color_v16') || 'color';
+    let ALL_DATA = [], GROUPS = {}, RECENT = JSON.parse(localStorage.getItem('fav_v17_allsets') || '[]');
+    let SKIN = parseInt(localStorage.getItem('user_skin_v17') || '0'), SET = localStorage.getItem('user_set_v17') || 'native';
+    let THEME = localStorage.getItem('user_theme_v17') || 'auto', ICONS = localStorage.getItem('user_icons_v17') || 'auto', LOCALE = localStorage.getItem('user_lang_v17') || 'en', COLOR_MODE = localStorage.getItem('user_color_v17') || 'color';
 
     async function fetchData() {
         document.getElementById('loader').style.display = 'flex';
@@ -203,7 +185,7 @@
         document.getElementById('search').placeholder = t.search;
         document.getElementById('title-recent').textContent = t.recent;
         document.getElementById('preview-name').textContent = t.placeholder;
-        ['set','color','theme','icons','version','locale','nav','prev'].forEach(k => {
+        ['set','color','theme','icons','version','locale'].forEach(k => {
             const el = document.getElementById(`lbl-${k}`); if(el) el.textContent = t[k] || I18N_MAP['en'][k];
         });
         document.querySelectorAll('.skin-opt span').forEach((s, i) => s.textContent = t.tones[i] || I18N_MAP['en'].tones[i]);
@@ -216,7 +198,7 @@
     }
 
     function updateSkinUI() {
-        let list = (SET === 'openmoji') ? SKIN_OPENMOJI : (SET === 'google' ? SKIN_GOOGLE : SKIN_NATIVE);
+        let list = SKIN_PATHS[SET] || SKIN_PATHS.native;
         const trigger = document.getElementById('skin-trigger');
         trigger.style.backgroundImage = `url('${list[SKIN]}')`;
         trigger.className = (COLOR_MODE === 'black') ? 'skin-trigger mode-black' : 'skin-trigger';
@@ -231,49 +213,45 @@
         return { char: cur.emoji, hex: cur.hexcode, label: obj.label };
     }
 
+    function applyGlyphStyle(btn, char, hex) {
+        const h = hex.toLowerCase();
+        const H = hex.toUpperCase();
+        if (SET === 'native') {
+            btn.textContent = char;
+            btn.className = (COLOR_MODE === 'black') ? 'emoji-btn mode-black' : 'emoji-btn';
+        } else if (SET === 'google') {
+            btn.textContent = char;
+            btn.className = (COLOR_MODE === 'black') ? 'emoji-btn f-google-black' : 'emoji-btn f-google-color';
+        } else if (SET === 'openmoji') {
+            const sub = (COLOR_MODE === 'black') ? 'black' : 'color';
+            btn.innerHTML = `<img src="https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/${sub}/72x72/${H}.png" loading="lazy" onerror="this.innerText='${char}'">`;
+        } else if (SET === 'twemoji') {
+            const url = `https://raw.githubusercontent.com/jdecked/twemoji/main/assets/72x72/${h}.png`;
+            const img = document.createElement('img');
+            img.src = url;
+            if (COLOR_MODE === 'black') img.className = 'mode-black';
+            img.onerror = () => { btn.innerText = char; };
+            btn.innerHTML = ''; btn.appendChild(img);
+        }
+    }
+
     function createBtn(obj) {
         const data = getEmojiData(obj);
         const b = document.createElement('button');
         b.className = 'emoji-btn';
-        
-        const applyStyle = (target) => {
-            if (SET === 'native') {
-                target.textContent = data.char;
-                target.className = (COLOR_MODE === 'black') ? 'emoji-btn mode-black' : 'emoji-btn';
-            } else if (SET === 'google') {
-                target.textContent = data.char;
-                target.className = (COLOR_MODE === 'black') ? 'emoji-btn f-google-black' : 'emoji-btn f-google-color';
-            } else if (SET === 'openmoji') {
-                const omSub = (COLOR_MODE === 'black') ? 'black' : 'color';
-                const imgUrl = `https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/${omSub}/72x72/${data.hex.toUpperCase()}.png`;
-                const img = document.createElement('img');
-                img.src = imgUrl;
-                img.onerror = () => { target.innerHTML = data.char; if(COLOR_MODE === 'black') target.classList.add('mode-black'); };
-                target.innerHTML = ''; target.appendChild(img);
-            }
-        };
-
-        applyStyle(b);
+        b.title = data.label;
+        applyGlyphStyle(b, data.char, data.hex);
 
         b.onmouseenter = () => {
             const pc = document.getElementById('preview-char');
-            if (SET === 'native') {
-                pc.textContent = data.char;
-                pc.className = (COLOR_MODE === 'black') ? 'mode-black' : '';
-            } else if (SET === 'google') {
-                pc.textContent = data.char;
-                pc.className = (COLOR_MODE === 'black') ? 'f-google-black' : 'f-google-color';
-            } else {
-                const omSub = (COLOR_MODE === 'black') ? 'black' : 'color';
-                pc.innerHTML = `<img src="https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/${omSub}/72x72/${data.hex.toUpperCase()}.png" onerror="this.parentElement.textContent='${data.char}'">`;
-            }
+            applyGlyphStyle(pc, data.char, data.hex);
             document.getElementById('preview-name').textContent = data.label;
         };
 
         b.onclick = () => {
             navigator.clipboard.writeText(data.char);
             RECENT = [obj, ...RECENT.filter(r => r.hexcode !== obj.hexcode)].slice(0, 16);
-            localStorage.setItem('fav_final_v16', JSON.stringify(RECENT));
+            localStorage.setItem('fav_v17_allsets', JSON.stringify(RECENT));
             const oldName = data.label;
             document.getElementById('preview-name').textContent = "Copied!";
             setTimeout(() => document.getElementById('preview-name').textContent = oldName, 800);
@@ -290,12 +268,14 @@
         main.innerHTML = ''; recGrid.innerHTML = '';
         if (!q && RECENT.length > 0) { recDiv.style.display = 'block'; RECENT.forEach(o => recGrid.appendChild(createBtn(o))); }
         else recDiv.style.display = 'none';
+
         const grouped = {};
         ALL_DATA.forEach(e => {
             if (!q || e.label.toLowerCase().includes(q) || (e.tags && e.tags.some(t => t.includes(q)))) {
                 if (!grouped[e.group]) grouped[e.group] = []; grouped[e.group].push(e);
             }
         });
+
         Object.keys(grouped).sort((a,b)=>a-b).forEach(gid => {
             const sec = document.createElement('div'); sec.id = `scroll-group-${gid}`;
             const tit = document.createElement('div'); tit.className = 'section-title'; tit.textContent = GROUPS[gid];
@@ -305,15 +285,13 @@
         });
     }
 
-    // Logic for Settings
-    document.getElementById('color-select').onchange = (e) => { COLOR_MODE = e.target.value; localStorage.setItem('user_color_v16', COLOR_MODE); updateSkinUI(); render(); };
-    document.getElementById('locale-select').onchange = (e) => { LOCALE = e.target.value; localStorage.setItem('user_lang_v16', LOCALE); fetchData(); };
-    document.getElementById('theme-select').onchange = (e) => { THEME = e.target.value; localStorage.setItem('user_theme_v16', THEME); updateThemeAndIcons(); };
-    document.getElementById('icon-style-select').onchange = (e) => { ICONS = e.target.value; localStorage.setItem('user_icons_v16', ICONS); updateThemeAndIcons(); };
-    document.getElementById('set-select').onchange = (e) => { SET = e.target.value; localStorage.setItem('user_set_v16', SET); updateSkinUI(); render(); };
-    document.getElementById('nav-pos-select').onchange = (e) => { document.getElementById('cat-nav').classList.toggle('bottom', e.target.value === 'bottom'); };
-    document.getElementById('prev-pos-select').onchange = (e) => { document.getElementById('picker-footer').classList.toggle('top', e.target.value === 'top'); };
-    document.getElementById('clear-history').onclick = () => { RECENT = []; localStorage.removeItem('fav_final_v16'); render(); };
+    // Settings
+    document.getElementById('color-select').onchange = (e) => { COLOR_MODE = e.target.value; localStorage.setItem('user_color_v17', COLOR_MODE); updateSkinUI(); render(); };
+    document.getElementById('locale-select').onchange = (e) => { LOCALE = e.target.value; localStorage.setItem('user_lang_v17', LOCALE); fetchData(); };
+    document.getElementById('theme-select').onchange = (e) => { THEME = e.target.value; localStorage.setItem('user_theme_v17', THEME); updateThemeAndIcons(); };
+    document.getElementById('icon-style-select').onchange = (e) => { ICONS = e.target.value; localStorage.setItem('user_icons_v17', ICONS); updateThemeAndIcons(); };
+    document.getElementById('set-select').onchange = (e) => { SET = e.target.value; localStorage.setItem('user_set_v17', SET); updateSkinUI(); render(); };
+    document.getElementById('clear-history').onclick = () => { RECENT = []; localStorage.removeItem('fav_v17_allsets'); render(); };
     document.getElementById('search').oninput = render;
     document.getElementById('cat-nav').onclick = e => {
         const b = e.target.closest('.nav-btn'); if (!b) return;
@@ -321,7 +299,7 @@
         if (target) document.getElementById('viewport').scrollTo({ top: target.offsetTop, behavior: 'smooth' });
     };
     document.getElementById('skin-trigger').onclick = (e) => { e.stopPropagation(); document.getElementById('skin-menu').classList.toggle('active'); };
-    document.querySelectorAll('.skin-opt').forEach(opt => opt.onclick = () => { SKIN = parseInt(opt.dataset.idx); localStorage.setItem('kenig_skin_v16', SKIN); updateSkinUI(); render(); });
+    document.querySelectorAll('.skin-opt').forEach(opt => opt.onclick = () => { SKIN = parseInt(opt.dataset.idx); localStorage.setItem('kenig_skin_v17', SKIN); updateSkinUI(); render(); });
     window.onclick = () => document.getElementById('skin-menu').classList.remove('active');
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if(THEME==='auto') updateThemeAndIcons(); });
 
