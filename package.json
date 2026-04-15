@@ -1,7 +1,7 @@
 {
   "name": "kenig-emoji-picker",
   "private": true,
-  "version": "1.0",
+  "version": "v1.0",
   "description": "A high-performance emoji picker supporting Native, Google, OpenMoji, and Twemoji sets.",
   "type": "module",
   "scripts": {
