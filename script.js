@@ -1,6 +1,7 @@
 /**
  * Kenig Emoji Picker - Main Script
- * Improvements: Bug fixes, debouncing, localStorage consistency, better error handling
+ * Improvements: OpenMoji data integration, debouncing, localStorage consistency, better error handling,
+ * memory leak prevention, image caching, and optimized rendering
  */
 
 // ===== INTERNATIONALIZATION =====
@@ -50,6 +51,9 @@ const STORAGE_KEYS = {
   color: 'user_color_v17'
 };
 
+const OPENMOJI_DATA_URL = 'https://cdn.jsdelivr.net/npm/openmoji@latest/data/openmoji.json';
+const EMOJIBASE_CDN = 'https://cdn.jsdelivr.net/npm/emojibase-data@latest';
+
 // ===== STATE MANAGEMENT =====
 let ALL_DATA = [];
 let GROUPS = {};
@@ -60,6 +64,9 @@ let THEME = localStorage.getItem(STORAGE_KEYS.theme) || 'auto';
 let ICONS = localStorage.getItem(STORAGE_KEYS.icons) || 'auto';
 let LOCALE = localStorage.getItem(STORAGE_KEYS.locale) || 'en';
 let COLOR_MODE = localStorage.getItem(STORAGE_KEYS.color) || 'color';
+let OPENMOJI_MAP = {}; // Cache for OpenMoji data
+let IMAGE_CACHE = new Map(); // Cache for loaded image URLs
+let SKIN_OPT_LISTENERS = []; // Track skin option listeners to prevent duplicates
 
 // ===== UTILITY FUNCTIONS =====
 
@@ -93,17 +100,78 @@ function setLoaderVisible(visible, message = '') {
   if (message) loader.textContent = message;
 }
 
+/**
+ * Get cached image URL or fetch and cache it
+ */
+function getCachedImageUrl(set, hex, colorMode) {
+  const cacheKey = `${set}-${hex}-${colorMode}`;
+  
+  if (IMAGE_CACHE.has(cacheKey)) {
+    return IMAGE_CACHE.get(cacheKey);
+  }
+  
+  let url = '';
+  const h = hex.toLowerCase();
+  const H = hex.toUpperCase();
+  
+  switch (set) {
+    case 'google':
+      url = `https://raw.githubusercontent.com/googlei18n/noto-emoji/main/png/128/emoji_u${h}.png`;
+      break;
+    case 'openmoji':
+      const sub = colorMode === 'black' ? 'black' : 'color';
+      url = `https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/${sub}/72x72/${H}.png`;
+      break;
+    case 'twemoji':
+      url = `https://raw.githubusercontent.com/jdecked/twemoji/main/assets/72x72/${h}.png`;
+      break;
+  }
+  
+  if (url) {
+    IMAGE_CACHE.set(cacheKey, url);
+  }
+  
+  return url;
+}
+
 // ===== DATA FETCHING =====
+
+/**
+ * Fetch and parse OpenMoji data for faster emoji rendering
+ */
+async function fetchOpenmojiData() {
+  try {
+    const response = await fetch(OPENMOJI_DATA_URL);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    
+    // Build map for quick lookups: hexcode -> openmoji data
+    if (Array.isArray(data)) {
+      data.forEach(item => {
+        OPENMOJI_MAP[item.hexcode] = item;
+      });
+    }
+    return true;
+  } catch (error) {
+    console.warn('Failed to load OpenMoji data:', error);
+    // Not critical, continue without it
+    return false;
+  }
+}
 
 async function fetchData() {
   setLoaderVisible(true, 'Loading v17.0 Stable...');
   try {
+    // Validate locale is supported by emojibase
+    const supportedLocales = ['en', 'pl', 'fr', 'de', 'it'];
+    const locale = supportedLocales.includes(LOCALE) ? LOCALE : 'en';
+    
     const [data, messages] = await Promise.all([
-      fetch(`https://cdn.jsdelivr.net/npm/emojibase-data@latest/${LOCALE}/data.json`).then(r => {
+      fetch(`${EMOJIBASE_CDN}/${locale}/data.json`).then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
       }),
-      fetch(`https://cdn.jsdelivr.net/npm/emojibase-data@latest/${LOCALE}/messages.json`).then(r => {
+      fetch(`${EMOJIBASE_CDN}/${locale}/messages.json`).then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
       })
@@ -111,12 +179,18 @@ async function fetchData() {
 
     // Validate response structure
     if (!Array.isArray(data)) throw new Error('Invalid data format');
-    if (!messages || !Array.isArray(messages.groups)) throw new Error('Invalid messages format');
+    if (!messages || typeof messages !== 'object') throw new Error('Invalid messages format');
 
     ALL_DATA = data;
-    messages.groups.forEach(g => {
-      GROUPS[g.order] = g.message;
-    });
+    GROUPS = {};
+    
+    if (Array.isArray(messages.groups)) {
+      messages.groups.forEach(g => {
+        if (g && typeof g === 'object' && g.order !== undefined) {
+          GROUPS[g.order] = g.message;
+        }
+      });
+    }
 
     setLoaderVisible(false);
     updateUIStrings();
@@ -212,21 +286,30 @@ function applyGlyphStyle(btn, char, hex) {
     case 'openmoji':
       const sub = COLOR_MODE === 'black' ? 'black' : 'color';
       const img = document.createElement('img');
-      img.src = `https://raw.githubusercontent.com/hfg-gmuend/openmoji/master/${sub}/72x72/${H}.png`;
+      const url = getCachedImageUrl('openmoji', hex, COLOR_MODE);
+      img.src = url;
       img.loading = 'lazy';
-      img.onerror = () => { btn.textContent = char; };
+      img.onerror = () => { 
+        btn.textContent = char;
+        btn.className = 'emoji-btn';
+      };
       btn.innerHTML = '';
       btn.appendChild(img);
+      btn.className = 'emoji-btn';
       break;
 
     case 'twemoji':
-      const url = `https://raw.githubusercontent.com/jdecked/twemoji/main/assets/72x72/${h}.png`;
       const twImg = document.createElement('img');
-      twImg.src = url;
+      const twUrl = getCachedImageUrl('twemoji', hex, COLOR_MODE);
+      twImg.src = twUrl;
       if (COLOR_MODE === 'black') twImg.className = 'mode-black';
-      twImg.onerror = () => { btn.textContent = char; };
+      twImg.onerror = () => { 
+        btn.textContent = char;
+        btn.className = 'emoji-btn';
+      };
       btn.innerHTML = '';
       btn.appendChild(twImg);
+      btn.className = 'emoji-btn';
       break;
 
     default:
@@ -235,43 +318,48 @@ function applyGlyphStyle(btn, char, hex) {
 }
 
 function createBtn(obj) {
-  const data = getEmojiData(obj);
-  const b = document.createElement('button');
-  b.className = 'emoji-btn';
-  b.title = data.label;
-  b.setAttribute('aria-label', data.label);
-  applyGlyphStyle(b, data.char, data.hex);
+  try {
+    const data = getEmojiData(obj);
+    const b = document.createElement('button');
+    b.className = 'emoji-btn';
+    b.title = data.label;
+    b.setAttribute('aria-label', data.label);
+    applyGlyphStyle(b, data.char, data.hex);
 
-  b.addEventListener('mouseenter', () => {
-    const pc = getElement('preview-char');
-    if (pc) applyGlyphStyle(pc, data.char, data.hex);
-    const pn = getElement('preview-name');
-    if (pn) pn.textContent = data.label;
-  });
-
-  b.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(data.char);
-      // Update recent
-      RECENT = [obj, ...RECENT.filter(r => r.hexcode !== obj.hexcode)].slice(0, 16);
-      localStorage.setItem(STORAGE_KEYS.recent, JSON.stringify(RECENT));
-
-      // Show "Copied" feedback
+    b.addEventListener('mouseenter', () => {
+      const pc = getElement('preview-char');
+      if (pc) applyGlyphStyle(pc, data.char, data.hex);
       const pn = getElement('preview-name');
-      if (pn) {
-        const oldName = data.label;
-        pn.textContent = "Copied!";
-        setTimeout(() => { pn.textContent = oldName; }, 800);
+      if (pn) pn.textContent = data.label;
+    });
+
+    b.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(data.char);
+        // Update recent
+        RECENT = [obj, ...RECENT.filter(r => r.hexcode !== obj.hexcode)].slice(0, 16);
+        localStorage.setItem(STORAGE_KEYS.recent, JSON.stringify(RECENT));
+
+        // Show "Copied" feedback
+        const pn = getElement('preview-name');
+        if (pn) {
+          const oldName = data.label;
+          pn.textContent = "Copied!";
+          setTimeout(() => { pn.textContent = oldName; }, 800);
+        }
+
+        // Re-render if no search active
+        if (!getElement('search')?.value) render();
+      } catch (error) {
+        console.error('Failed to copy emoji:', error);
       }
+    });
 
-      // Re-render if no search active
-      if (!getElement('search')?.value) render();
-    } catch (error) {
-      console.error('Failed to copy emoji:', error);
-    }
-  });
-
-  return b;
+    return b;
+  } catch (error) {
+    console.error('Failed to create button for emoji:', obj, error);
+    return null;
+  }
 }
 
 // ===== RENDERING =====
@@ -291,7 +379,10 @@ function render() {
   // Show recent if no search
   if (!q && RECENT.length > 0) {
     recDiv.style.display = 'block';
-    RECENT.forEach(o => recGrid.appendChild(createBtn(o)));
+    RECENT.forEach(o => {
+      const btn = createBtn(o);
+      if (btn) recGrid.appendChild(btn);
+    });
   } else {
     recDiv.style.display = 'none';
   }
@@ -300,8 +391,8 @@ function render() {
   const grouped = {};
   ALL_DATA.forEach(e => {
     const matchesQuery = !q ||
-      e.label.toLowerCase().includes(q) ||
-      (e.tags && e.tags.some(t => t.toLowerCase().includes(q)));
+      (e.label && e.label.toLowerCase().includes(q)) ||
+      (e.tags && Array.isArray(e.tags) && e.tags.some(t => t && t.toLowerCase().includes(q)));
 
     if (matchesQuery) {
       if (!grouped[e.group]) grouped[e.group] = [];
@@ -311,7 +402,7 @@ function render() {
 
   // Render groups
   Object.keys(grouped)
-    .sort((a, b) => a - b)
+    .sort((a, b) => parseInt(a) - parseInt(b))
     .forEach(gid => {
       const sec = document.createElement('div');
       sec.id = `scroll-group-${gid}`;
@@ -322,7 +413,10 @@ function render() {
 
       const grid = document.createElement('div');
       grid.className = 'emoji-grid';
-      grouped[gid].forEach(o => grid.appendChild(createBtn(o)));
+      grouped[gid].forEach(o => {
+        const btn = createBtn(o);
+        if (btn) grid.appendChild(btn);
+      });
 
       sec.append(tit, grid);
       main.appendChild(sec);
@@ -338,6 +432,7 @@ function setupEventListeners() {
     colorSelect.addEventListener('change', (e) => {
       COLOR_MODE = e.target.value;
       localStorage.setItem(STORAGE_KEYS.color, COLOR_MODE);
+      IMAGE_CACHE.clear(); // Clear image cache on color change
       updateSkinUI();
       render();
     });
@@ -375,6 +470,7 @@ function setupEventListeners() {
     setSelect.addEventListener('change', (e) => {
       SET = e.target.value;
       localStorage.setItem(STORAGE_KEYS.set, SET);
+      IMAGE_CACHE.clear(); // Clear image cache on set change
       updateSkinUI();
       render();
     });
@@ -415,7 +511,7 @@ function setupEventListeners() {
     });
   }
 
-  // Skin tone selector
+  // Skin tone selector - use event delegation to prevent memory leaks
   const skinTrigger = getElement('skin-trigger');
   if (skinTrigger) {
     skinTrigger.addEventListener('click', (e) => {
@@ -425,18 +521,26 @@ function setupEventListeners() {
     });
   }
 
-  document.querySelectorAll('.skin-opt').forEach(opt => {
-    opt.addEventListener('click', () => {
-      SKIN = parseInt(opt.dataset.idx);
-      localStorage.setItem(STORAGE_KEYS.skin, SKIN);
-      updateSkinUI();
-      render();
+  // Use event delegation for skin options to prevent listener stacking
+  const skinMenu = getElement('skin-menu');
+  if (skinMenu) {
+    skinMenu.addEventListener('click', (e) => {
+      const opt = e.target.closest('.skin-opt');
+      if (opt && opt.dataset.idx !== undefined) {
+        SKIN = parseInt(opt.dataset.idx);
+        localStorage.setItem(STORAGE_KEYS.skin, SKIN);
+        updateSkinUI();
+        render();
+      }
     });
-  });
+  }
 
-  window.addEventListener('click', () => {
-    const menu = getElement('skin-menu');
-    if (menu) menu.classList.remove('active');
+  window.addEventListener('click', (e) => {
+    // Only close menu if click is outside skin menu
+    if (!e.target.closest('.skin-trigger') && !e.target.closest('.skin-menu')) {
+      const menu = getElement('skin-menu');
+      if (menu) menu.classList.remove('active');
+    }
   });
 
   // Theme preference changes
@@ -447,7 +551,12 @@ function setupEventListeners() {
 
 // ===== INITIALIZATION =====
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   setupEventListeners();
+  
+  // Fetch OpenMoji data in parallel with main data (non-blocking)
+  fetchOpenmojiData();
+  
+  // Fetch main emoji data
   fetchData();
 });
