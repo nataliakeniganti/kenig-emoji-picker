@@ -53,6 +53,8 @@ const STORAGE_KEYS = {
 
 const OPENMOJI_DATA_URL = 'https://cdn.jsdelivr.net/npm/openmoji@latest/data/openmoji.json';
 const EMOJIBASE_CDN = 'https://cdn.jsdelivr.net/npm/emojibase-data@latest';
+const EXTRAS_OPENMOJI_URL = './extras-openmoji.json';
+const EXTRAS_UNICODE_URL = './extras-unicode.json';
 
 // ===== STATE MANAGEMENT =====
 let ALL_DATA = [];
@@ -65,6 +67,8 @@ let ICONS = localStorage.getItem(STORAGE_KEYS.icons) || 'auto';
 let LOCALE = localStorage.getItem(STORAGE_KEYS.locale) || 'en';
 let COLOR_MODE = localStorage.getItem(STORAGE_KEYS.color) || 'color';
 let OPENMOJI_MAP = {}; // Cache for OpenMoji data
+let EXTRAS_OPENMOJI = {}; // Cache for extras-openmoji.json data
+let EXTRAS_UNICODE = {}; // Cache for extras-unicode.json data
 let IMAGE_CACHE = new Map(); // Cache for loaded image URLs
 let SKIN_OPT_LISTENERS = []; // Track skin option listeners to prevent duplicates
 
@@ -155,6 +159,54 @@ async function fetchOpenmojiData() {
   } catch (error) {
     console.warn('Failed to load OpenMoji data:', error);
     // Not critical, continue without it
+    return false;
+  }
+}
+
+/**
+ * Fetch and parse extras-openmoji.json data
+ */
+async function fetchExtrasOpenmojiData() {
+  try {
+    const response = await fetch(EXTRAS_OPENMOJI_URL);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    
+    // Build map for quick lookups
+    if (Array.isArray(data)) {
+      data.forEach(item => {
+        EXTRAS_OPENMOJI[item.hexcode] = item;
+      });
+    } else if (typeof data === 'object') {
+      EXTRAS_OPENMOJI = data;
+    }
+    return true;
+  } catch (error) {
+    console.warn('Failed to load extras-openmoji.json:', error);
+    return false;
+  }
+}
+
+/**
+ * Fetch and parse extras-unicode.json data
+ */
+async function fetchExtrasUnicodeData() {
+  try {
+    const response = await fetch(EXTRAS_UNICODE_URL);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    
+    // Build map for quick lookups
+    if (Array.isArray(data)) {
+      data.forEach(item => {
+        EXTRAS_UNICODE[item.hexcode] = item;
+      });
+    } else if (typeof data === 'object') {
+      EXTRAS_UNICODE = data;
+    }
+    return true;
+  } catch (error) {
+    console.warn('Failed to load extras-unicode.json:', error);
     return false;
   }
 }
@@ -268,6 +320,25 @@ function getEmojiData(obj) {
   };
 }
 
+/**
+ * Enrich emoji data with extras information if available
+ */
+function enrichEmojiData(obj) {
+  const hexcode = obj.hexcode;
+  
+  // Check for extras-openmoji data
+  if (EXTRAS_OPENMOJI[hexcode]) {
+    obj.openmojiExtra = EXTRAS_OPENMOJI[hexcode];
+  }
+  
+  // Check for extras-unicode data
+  if (EXTRAS_UNICODE[hexcode]) {
+    obj.unicodeExtra = EXTRAS_UNICODE[hexcode];
+  }
+  
+  return obj;
+}
+
 function applyGlyphStyle(btn, char, hex) {
   const h = hex.toLowerCase();
   const H = hex.toUpperCase();
@@ -319,6 +390,9 @@ function applyGlyphStyle(btn, char, hex) {
 
 function createBtn(obj) {
   try {
+    // Enrich with extras data
+    enrichEmojiData(obj);
+    
     const data = getEmojiData(obj);
     const b = document.createElement('button');
     b.className = 'emoji-btn';
@@ -554,8 +628,10 @@ function setupEventListeners() {
 document.addEventListener('DOMContentLoaded', async () => {
   setupEventListeners();
   
-  // Fetch OpenMoji data in parallel with main data (non-blocking)
+  // Fetch OpenMoji and extras data in parallel with main data (non-blocking)
   fetchOpenmojiData();
+  fetchExtrasOpenmojiData();
+  fetchExtrasUnicodeData();
   
   // Fetch main emoji data
   fetchData();
